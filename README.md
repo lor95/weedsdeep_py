@@ -12,4 +12,4 @@ il secondo script, lanciato all'interno dell'ambiente _QGIS_ (richiesta la versi
 
 ![Alt diagram](https://i.ibb.co/w04s7rv/diag.png)
 
-__si vogliono poi adattare gli script a ricevere in input una serie di immagini anziché una sola__
+__si vuole poi adattare gli script a ricevere in input una serie di immagini anziché una sola__
