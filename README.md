@@ -11,5 +11,3 @@ il primo (necessita l'installazione di `opencv-python`) segmenta, dato un path, 
 il secondo script, lanciato all'interno dell'ambiente _QGIS_ (richiesta la versione _3_ o superiore) genera lo shapefile (work in progress)
 
 ![Alt diagram](https://i.ibb.co/w04s7rv/diag.png)
-
-__si vuole poi adattare gli script a ricevere in input una serie di immagini anziché una sola__
