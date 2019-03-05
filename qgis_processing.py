@@ -34,11 +34,8 @@ band.bandNumber = 1
 entries.append(band)
 
 # Raster calculation process
-calc = QgsRasterCalculator(band.ref + '/255', path, "GTiff", layer.extent(), layer.width(), layer.height(), entries)
+calc = QgsRasterCalculator(band.ref, path, "GTiff", layer.extent(), layer.width(), layer.height(), entries)# + '/255', path, "GTiff", layer.extent(), layer.width(), layer.height(), entries)
 calc.processCalculation() # creates a Raster GDAL-compatible (editable), overwrites old tiff file
-
-# Load Raster
-#qgis.utils.iface.addRasterLayer(path, "calc_raster")
 
 ###################################################################################################
 
@@ -47,29 +44,9 @@ processing.run(r"gdal:polygonize",
 	'BAND': 1,
 	'FIELD': 'VEGETATED',
 	'EIGHT_CONNECTEDNESS': 1,
-#	'MASK': path,
 	'OUTPUT': os.path.dirname(path) + "/" + filename + ".shp"})
 
 qgis.utils.iface.addVectorLayer(os.path.dirname(path) + "/" + filename + ".shp", 'SHP', 'ogr')
-
-#gdal.UseExceptions()
-#src_ds = gdal.Open(path)
-#if src_ds is None:
-#    print('Unable to open %s' % src_filename)
-#    sys.exit(1)
-
-#try:
-#    srcband = src_ds.GetRasterBand(1)
-#except(RuntimeError, e):
-#    print(e)
-#    sys.exit(1)
-
-#dst_layername = "POLYGONIZED"
-#drv = ogr.GetDriverByName("ESRI Shapefile")
-#dst_ds = drv.CreateDataSource(dst_layername + ".shp")
-#dst_layer = dst_ds.CreateLayer(dst_layername, srs = None)
-
-# gdal.Polygonize(srcband, None, dst_layer, -1, [], callback=None)
 
 ############################################################################
 
