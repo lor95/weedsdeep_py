@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<paths> <!-- to be removed -> GUI -->
+		<rawdat_path>/img/data/RAW.dat</rawdat_path>
+		<raster_path>/img/rasters</raster_path>
+	</paths>
+	<params>
+		<hsv_mask>
+			<lowerb>
+				<!-- questi elementi non sono individuati -->
+				<h_lb>35</h_lb>
+				<s_lb>40</s_lb>
+				<v_lb>40</v_lb>
+			</lowerb>
+			<upperb>
+				<!-- questi elementi non sono individuati -->
+				<h_ub>80</h_ub>
+				<s_ub>255</s_ub>
+				<v_ub>255</v_ub>
+			</upperb>
+		</hsv_mask>
+		<gaussian_blur>
+			<ksize>
+				<x>11</x>
+				<y>11</y>
+			</ksize>
+			<sigma>5</sigma>
+		</gaussian_blur>
+		<!-- dilation/erosion params -->
+		<dil_er>
+			<ksize>11</ksize>
+			<iterations>5</iterations>
+		</dil_er>
+		<resize>
+			<n_times>2</n_times>
+			<ratio>0.5</ratio>
+			<!-- 0 linear interpolation (INT_LINEAR)
+				 1 nearest neighbour interpolation (INT_NEAREST) -->
+			<interpolation>0</interpolation>
+		</resize>
+		<!-- labeling params -->
+		<labeling>
+			<!-- min value in pixels -->
+			<area_thr>2000</area_thr>
+		</labeling>
+	</params>
+</config>
