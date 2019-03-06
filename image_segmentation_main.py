@@ -14,12 +14,14 @@ for line in config_ini:
 config_ini.close()
 
 # to be removed -> Gui
-img_dat_path = os.path.dirname(os.path.realpath(__file__)) + config[0]
-if not os.path.exists(os.path.dirname(img_dat_path)):
-    os.makedirs(os.path.dirname(img_dat_path))
-img_dat = open(img_dat_path, 'w')
-img_dat.write(img_path)
-img_dat.close()
+raw_dat_path = os.path.dirname(os.path.realpath(__file__)) + config[0]
+if not os.path.exists(os.path.dirname(raw_dat_path)):
+    os.makedirs(os.path.dirname(raw_dat_path))
+raw_dat = open(raw_dat_path, 'w')
+raw_dat.write(img_path)
+raw_dat.close()
+# to be removed -> Gui
+tiff_dat_path = os.path.dirname(raw_dat_path) + '/TIFF.dat'
 
 filename = os.path.splitext(os.path.basename(img_path))[0]  # gets the image file name (without extension)
 raster_directory = os.path.dirname(os.path.realpath(__file__)) + config[1]  # Gui (tiff directory)
@@ -40,37 +42,37 @@ ksize = config[3].split(';')[0]
 sigma = config[3].split(';')[1]
 img = cv.GaussianBlur(img, (int(ksize.split(' ')[0]), int(ksize.split(' ')[1])), int(sigma)) 
 thr, img = cv.threshold(img, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)  # otsu thresholding
-cv.imshow("image", img);cv.waitKey();cv.destroyAllWindows()
+cv.imshow("thresholding otsu", img);cv.waitKey();cv.destroyAllWindows()
 
 d_e_kernel = np.ones((int(config[4].split(';')[0]),int(config[4].split(';')[0])), np.uint8)
-img = cv.dilate(img, d_e_kernel)#, int(config[4].split(';')[1])) # dilate n times
-img = cv.erode(img, d_e_kernel)#, int(config[4].split(';')[1])) # erode n times
-cv.imshow("image", img);cv.waitKey();cv.destroyAllWindows()
+img = cv.dilate(img, d_e_kernel, int(config[4].split(';')[1])) # dilate n times
+img = cv.erode(img, d_e_kernel, int(config[4].split(';')[1])) # erode n times
+cv.imshow("dilation erosion 1", img);cv.waitKey();cv.destroyAllWindows()
 
 for i in range(int(config[5])): # resize
     img = cv.resize(img, None, fx = float(config[6]), fy = float(config[6]), 
-                    interpolation = cv.INTER_NEAREST)
+                    interpolation = cv.INTER_LINEAR) # INTER_NEAREST, INTER_LINEAR
 for i in range(int(config[5])): # resize
     img = cv.resize(img, None, fx = float(config[6]) ** -1, fy = float(config[6]) ** -1, 
-                    interpolation = cv.INTER_NEAREST)
+                    interpolation = cv.INTER_LINEAR) # INTER_NEAREST, INTER_LINEAR
+cv.imshow("resized", img);cv.waitKey();cv.destroyAllWindows()
 
-cv.imshow("image", img);cv.waitKey();cv.destroyAllWindows()
-
+# labeling phase
 out = cv.connectedComponentsWithStats(img)
-#print(out[0])
-#for label in range(1,out[0]):
-#    mask = np.array(out[1], dtype=np.uint8)
-#    mask[out[1] == label] = 255
-    
-#for i in range(1, out[0]):
-#    lblareas = out[2][0:, cv.CC_STAT_AREA]
-#    print(lblareas)
-#    imax = max(enumerate(lblareas), key=(lambda x: x[1]))[0] + 1
-#    cv.rectangle(img, (int(out[2][imax, cv.CC_STAT_LEFT]),int(out[2][imax, cv.CC_STAT_TOP])), (int(out[2][imax, cv.CC_STAT_LEFT])+int(out[2][imax, cv.CC_STAT_WIDTH]), int(out[2][imax, cv.CC_STAT_TOP])+int(out[2][imax, cv.CC_STAT_HEIGHT])), (255,0,0), 2)
-#cv.imshow("image", img);cv.waitKey();cv.destroyAllWindows()
+sizes = out[2][1:, -1];
+min_size = int(config[7])
+for i in range(0, out[0] - 1):  
+    if sizes[i] >= min_size:
+        img[out[1] == i + 1] = 255
+    else:
+        img[out[1] == i + 1] = 0
+cv.imshow("labeled", img);cv.waitKey();cv.destroyAllWindows()
 
 img = cv.dilate(img, d_e_kernel, int(config[4].split(';')[1])) # dilate
 img = cv.erode(img, d_e_kernel, int(config[4].split(';')[1])) # erode
-cv.imshow("image", img);cv.waitKey();cv.destroyAllWindows()
+cv.imshow("dilation erosion 2", img);cv.waitKey();cv.destroyAllWindows()
 
+tiff_dat = open(tiff_dat_path, 'w')
+tiff_dat.write(raster_directory + '/' + filename +'.tiff')
+tiff_dat.close()
 cv.imwrite(raster_directory + '/' + filename +'.tiff', img) # salva immagine nella cartella corrente
