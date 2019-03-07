@@ -22,7 +22,7 @@ params = root.findall('params')
 for conf in general:
     config['show_img'] = int(conf.find('show_img').text)
 for param in params:
-    hsv_mask = param.find('hsv_mask')
+    hsv_mask = param.findall('hsv_mask')
     gauss = param.findall('gaussian_blur')
     dil_er = param.findall('dil_er')
     resize = param.findall('resize')
@@ -45,13 +45,13 @@ for param in labeling:
     config['area_thr'] = int(param.find('area_thr').text)
 # third level
 for param in hsv_lb:
-    config['h_lb'] = int(param.find('h_lb').text)
-    config['s_lb'] = int(param.find('s_lb').text)
-    config['v_lb'] = int(param.find('v_lb').text)
+    config['h_lb'] = int(param.find('h').text)
+    config['s_lb'] = int(param.find('s').text)
+    config['v_lb'] = int(param.find('v').text)
 for param in hsv_ub:
-    config['h_ub'] = int(param.find('h_ub').text)
-    config['s_ub'] = int(param.find('s_ub').text)
-    config['v_ub'] = int(param.find('v_ub').text)
+    config['h_ub'] = int(param.find('h').text)
+    config['s_ub'] = int(param.find('s').text)
+    config['v_ub'] = int(param.find('v').text)
 for param in gauss_ker:
     config['gk_x'] = int(param.find('x').text)
     config['gk_y'] = int(param.find('y').text)
@@ -62,6 +62,7 @@ else:
     config['interpolation'] = cv.INTER_NEAREST
 
 images = []
+
 raw_file = open(raw_file_path, 'r')
 for line in raw_file:
     images.append(line.strip())
@@ -72,8 +73,7 @@ tiff_file = open(tiff_file_path, 'w')
 if not os.path.exists(raster_directory):
     os.makedirs(raster_directory)
 
-for i in range(len(images)):
-    
+for i in range(len(images)):    
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
         
     # image processing
@@ -81,8 +81,7 @@ for i in range(len(images)):
     img = cv.imread(images[i])  # for loop starts for each img in RAW.dat
     img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
-    img = cv.inRange(img, (35, 40, 40),(80, 255, 255)) # QUARTO SEGRETO DI FATIMA DEL PERCHé NON LEGGA I VALORI VIA XML
-    #img = cv.inRange(img, (config['h_lb'], config['s_lb'], config['v_lb']), (config['h_ub'], config['s_ub'], config['v_ub'])) # mask green, exclude soil
+    img = cv.inRange(img, (config['h_lb'], config['s_lb'], config['v_lb']), (config['h_ub'], config['s_ub'], config['v_ub'])) # mask green, exclude soil
 
     img = cv.GaussianBlur(img, (config['gk_x'], config['gk_y']), config['sigma'])
     thr, img = cv.threshold(img, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)  # otsu thresholding
@@ -114,14 +113,15 @@ for i in range(len(images)):
     
     # check    
     if config['show_img']:
-        cv.imshow(filename + ' - Press ESC to exit.', img);
+        winname = filename + ' - Press ESC to quit execution.'
+        cv.imshow(winname, img);
+        cv.moveWindow(winname, 0, 0)
         key = cv.waitKey();
         if key == 27:
-            tiff_file.close()
-            os.remove(tiff_file_path)
+            # tiff_file.close()
+            # os.remove(tiff_file_path)
             cv.destroyAllWindows()
             break
         cv.destroyAllWindows()
-
 # end loop
 tiff_file.close()
