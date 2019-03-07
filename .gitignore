@@ -1,5 +1,5 @@
 /.project
 /.pydevproject
 img/rasters
-img/data
+data/
 img/shapefiles

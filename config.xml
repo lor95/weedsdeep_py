@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<paths> <!-- to be removed -> GUI -->
-		<rawdat_path>/img/data/RAW.dat</rawdat_path>
-		<raster_path>/img/rasters</raster_path>
-	</paths>
+	<general>
+		<!-- 0-1 - do not show/show images while processing them -->
+		<show_img>0</show_img>
+	</general>
 	<params>
 		<hsv_mask>
 			<lowerb>
@@ -19,6 +19,7 @@
 				<v_ub>255</v_ub>
 			</upperb>
 		</hsv_mask>
+		<!-- gaussian blur params, see docs for further details -->
 		<gaussian_blur>
 			<ksize>
 				<x>11</x>
@@ -44,4 +45,4 @@
 			<area_thr>2000</area_thr>
 		</labeling>
 	</params>
-</config>
+	</config>
