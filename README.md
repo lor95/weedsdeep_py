@@ -15,4 +15,4 @@ All'interno del file `config.xml` è possibile configurare la segmentazione.
 `qgis_processing.py` viene lanciato all'interno dell'ambiente _QGIS_ (richiesta la versione _3_ o superiore), genera gli _shapefiles_ della lista di immagini escludendo il terreno.  
 Gli _shapefiles_ vengono inoltre visualizzati nel progetto _QGIS_ per una maggiore comprensione degli stessi.  
 
-![Alt diagram](https://i.ibb.co/WsZKSJ4/diag.png)
+![Alt diagram](https://i.ibb.co/JK6ppXb/diag.png)
