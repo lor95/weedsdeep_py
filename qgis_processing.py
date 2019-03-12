@@ -17,7 +17,7 @@ path, res = QtWidgets.QInputDialog.getText(qid, title, label, mode) # path -> pa
 
 # initialization
 
-crs = QgsCoordinateReferenceSystem("EPSG:4326")
+crs = QgsCoordinateReferenceSystem("EPSG:32633")
 QgsProject.instance().setCrs(crs) # standard crs (does not work!)
 
 config = []  # contains all the configurations
@@ -48,55 +48,74 @@ file_shp = open(shape_dat_path, 'w')
 
 # core
 
-# loops over all tiff images (now disabled)
-# l'idea è quella di permettere all'utente di cliccare un button "next" in una GUI appositamente creata (o di cliccare un tasto specifico)
-# una volta terminato di editare l'immagine corrente, per poter proseguire con l'immagine successiva caricata nell'array tiffs (e raws)
-#for i in range(len(tiffs)):
+# loops over all tiff images
+for i in range(len(tiffs)):
 
-# Load Raster
-filename = os.path.splitext(os.path.basename(tiffs[0]))[0] # gets the first .tiff file name (without extension)
+    # Load Raster
+    filename = os.path.splitext(os.path.basename(tiffs[i]))[0] # gets the first .tiff file name (without extension)
 	
-shapefolder = shapefile_directory + '/' + filename # folder that contains shp for every file
-if not os.path.exists(shapefolder):
-	os.makedirs(shapefolder)
+    shapefolder = shapefile_directory + '/' + filename # folder that contains shp for every file
+    if not os.path.exists(shapefolder):
+        os.makedirs(shapefolder)
 
-raster = QgsRasterLayer(tiffs[0], filename)
-QgsProject.instance().addMapLayer(raster) # .tiff is loaded in the project
-entries = []
+    raster = QgsRasterLayer(tiffs[i], filename)
+    raster.setCrs(crs)
+    QgsProject.instance().addMapLayer(raster) # .tiff is loaded in the project
+    entries = []
 
-# Define band
-band = QgsRasterCalculatorEntry()
-band.ref = filename + '@1'
-band.raster = raster
-band.bandNumber = 1
-entries.append(band)
+    # Define band
+    band = QgsRasterCalculatorEntry()
+    band.ref = filename + '@1'
+    band.raster = raster
+    band.bandNumber = 1
+    entries.append(band)
 
-# Raster calculation process
-calc = QgsRasterCalculator(band.ref, tiffs[0], "GTiff", raster.extent(), raster.width(), raster.height(), entries)
-calc.processCalculation() # creates a Raster GDAL-compatible (editable), overwrites old tiff file
+    # Raster calculation process
+    calc = QgsRasterCalculator(band.ref, tiffs[i], "GTiff", raster.extent(), raster.width(), raster.height(), entries)
+    calc.processCalculation() # creates a Raster GDAL-compatible (editable), overwrites old tiff file
 
-QgsProject.instance().removeMapLayers([raster.id()]) # tiff is not useful anymore
+    #QgsProject.instance().removeMapLayers([raster.id()]) # tiff is not useful anymore #####################################################
 	
-QgsProject.instance().addMapLayer(QgsRasterLayer(raws[0], filename)) # adds raw image to project as raster
+    #QgsProject.instance().addMapLayer(QgsRasterLayer(raws[0], filename)) # adds raw image to project as raster ######################################################
 	
-processing.run(r"gdal:polygonize",
-{'INPUT': tiffs[0],
-	'BAND': 1,
-	'FIELD': 'VEGETATED',
-	'EIGHT_CONNECTEDNESS': 1,
-	'OUTPUT': shapefolder + "/" + filename + ".shp"}) # generates shp
+    processing.run(r"gdal:polygonize",
+    {'INPUT': tiffs[i],
+        'BAND': 1,
+        'FIELD': 'VEGETATED',
+        'EIGHT_CONNECTEDNESS': 1,
+        'OUTPUT': shapefolder + "/" + filename + ".shp"}) # generates shp
 
-file_shp.write(shapefolder + "/" + filename + ".shp")
-shp = QgsVectorLayer(shapefolder + "/" + filename + ".shp", 'SHP_' + filename, 'ogr')
-with edit(shp):
-	soil = QgsFeatureRequest().setFilterExpression('"VEGETATED" != 255')
-	soil.setSubsetOfAttributes([])
-	soil.setFlags(QgsFeatureRequest.NoGeometry)
-	for feature in shp.getFeatures(soil):
-		shp.deleteFeature(feature.id()) # remove soil
+    file_shp.write(shapefolder + "/" + filename + ".shp")
+    shp = QgsVectorLayer(shapefolder + "/" + filename + ".shp", 'SHP_' + filename, 'ogr')
+    shp.setCrs(crs)
+    with edit(shp):
+        soil = QgsFeatureRequest().setFilterExpression('"VEGETATED" != 255')
+        soil.setSubsetOfAttributes([])
+        soil.setFlags(QgsFeatureRequest.NoGeometry)
+        for feature in shp.getFeatures(soil):
+            shp.deleteFeature(feature.id()) # remove soil
 
-shp.dataProvider().addAttributes([QgsField("CROP", QVariant.Bool), QgsField("TEST", QVariant.Int)]) # adds attributes to the vector layer (test)
-shp.updateFields()
-QgsProject.instance().addMapLayer(shp) # adds shp to project, to be manually modified
+    shp.dataProvider().addAttributes([QgsField('AREA', QVariant.Double), QgsField('PERIMETER', QVariant.Double)]) # adds attributes to the vector layer (test)
+    shp.updateFields()
+    area = shp.fields().indexFromName('AREA')
+    perimeter = shp.fields().indexFromName('PERIMETER')
+    shp.startEditing()
+    e0 = QgsExpression("""$area""")
+    e1 = QgsExpression("""$perimeter""")
+    c = QgsExpressionContext()
+    s = QgsExpressionContextScope()
+    s.setFields(shp.fields())
+    c.appendScope(s)
+    e0.prepare(c)
+    e1.prepare(c)
+    
+    for feature in shp.getFeatures():
+        c.setFeature(feature)
+        shp.dataProvider().changeAttributeValues({feature.id():{
+            area: e0.evaluate(c),
+            perimeter: e1.evaluate(c)}})
+    shp.commitChanges()
+    
+    QgsProject.instance().addMapLayer(shp) # adds shp to project, to be manually modified
 
 file_shp.close()

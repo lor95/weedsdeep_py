@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 	<general>
-		<!-- 0-1 - don't show/show images while processing them -->
+		<!-- 0 - don't show
+			 1 - show -->
 		<show_img>1</show_img>
 	</general>
-	<params>
+	<geo_params>
+		<!-- if 1 -> EPSG:4326 -> EPSG:32633 -->
+		<crs_transform>1</crs_transform>
+		<!-- 1 (pixel) = var (meters) -->
+		<gsd>0.09</gsd>
+		<rotate_x>0</rotate_x>
+		<rotate_y>0</rotate_y>
+	</geo_params>
+	<segmentation_params>
 		<!-- hsv mask params -->
 		<hsv_mask>
 			<lowerb>
@@ -42,7 +51,7 @@
 		<!-- labeling params -->
 		<labeling>
 			<!-- min value in pixels -->
-			<area_thr>2000</area_thr>
+			<area_thr>6500</area_thr>
 		</labeling>
-	</params>
+	</segmentation_params>
 </config>

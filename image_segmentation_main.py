@@ -4,6 +4,9 @@ import os
 import sys
 import cv2 as cv
 import numpy as np
+import exiftool
+#import gdal
+from pyproj import Proj, transform
 import xml.etree.ElementTree as et
 
 raw_file_path = sys.argv[1]
@@ -17,10 +20,16 @@ root = et.parse(config_xml_path).getroot() # contains all the configurations, pa
 
 # root level
 general = root.findall('general')
-params = root.findall('params')
+geo = root.findall('geo_params')
+params = root.findall('segmentation_params')
 # first level
 for conf in general:
     config['show_img'] = int(conf.find('show_img').text)
+for param in geo:
+    config['crs_transform'] = int(param.find('crs_transform').text)
+    config['gsd'] = float(param.find('gsd').text)
+    config['rotate_x'] = float(param.find('rotate_x').text)
+    config['rotate_y'] = float(param.find('rotate_y').text)
 for param in params:
     hsv_mask = param.findall('hsv_mask')
     gauss = param.findall('gaussian_blur')
@@ -70,13 +79,35 @@ raw_file.close()
 
 tiff_file = open(tiff_file_path, 'w')
 
+lat = ['43.5587','43.5598','43.5608','43.5618'] ######################################
+long = ['13.2226','13.2226','13.2226','13.2226'] ######################################
+
+
 if not os.path.exists(raster_directory):
     os.makedirs(raster_directory)
 
 for i in range(len(images)):    
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
-        
-    # image processing
+	
+    v = i ##################################################################################################
+    lat[v], long[v] = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), lat[v], long[v]) ##################################################
+	
+    #with exiftool.ExifTool() as e:
+    #   lat = e.get_tag('EXIF:GPSLatitude', images[i])
+    #   long = e.get_tag('EXIF:GPSLongitude', images[i])
+    
+    #if config['crs_transform']:
+    #    lat, long = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), lat, long)    
+    #    with exiftool.ExifTool(exiftool_exe) as e:
+    #        e.execute("-GPSLatitude=" + lat, images[i]) # update metadata
+    #        e.execute("-GPSAltitude=" + long, images[i])
+    
+    #with exiftool.ExifTool() as e:
+    #    meta_lat = e.get_tag('EXIF:GPSLatitude', images[i])
+    #    meta_long = e.get_tag('EXIF:GPSLongitude', images[i])
+    #    print(meta_lat);print(meta_long)
+    
+	# image processing
 
     img = cv.imread(images[i])  # for loop starts for each img in RAW.dat
     img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
@@ -108,8 +139,20 @@ for i in range(len(images)):
     img = cv.erode(img, d_e_kernel, config['iterations']) # erode n times
     
     # write data
+	
     tiff_file.write(raster_directory + '/' + filename + '.tiff\n')
     cv.imwrite(raster_directory + '/' + filename + '.tiff', img) # save image
+	
+    #driver = gdal.GetDriverByName('GTiff') operate with gdal?!
+    
+    tfw_file = open(raster_directory + '/' + filename + '.tfw', 'w') ###################################
+    tfw_file.write(str(config['gsd']) + '\n') #########################################################
+    tfw_file.write(str(config['rotate_y']) + '\n') ####################################################
+    tfw_file.write(str(config['rotate_x']) + '\n') #################################################
+    tfw_file.write('-' + str(config['gsd']) + '\n') ###################################################
+    tfw_file.write(str(long[v]) + '\n') ##############################################################
+    tfw_file.write(str(lat[v]) + '\n') #############################################################
+    tfw_file.close() ################################################################################
     
     # check    
     if config['show_img']:
@@ -118,10 +161,10 @@ for i in range(len(images)):
         cv.moveWindow(winname, 0, 0)
         key = cv.waitKey();
         if key == 27:
-            # tiff_file.close()
-            # os.remove(tiff_file_path)
             cv.destroyAllWindows()
             break
         cv.destroyAllWindows()
+
+		
 # end loop
 tiff_file.close()
