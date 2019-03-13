@@ -10,14 +10,14 @@ from qgis.analysis import QgsRasterCalculator, QgsRasterCalculatorEntry
 
 # Load input dialog -> to be removed
 qid = QtWidgets.QInputDialog()
-title = "qgis_processing"
-label = "Enter config-qgis.ini path:"
+title = 'qgis_processing'
+label = 'Enter config-qgis.ini path:'
 mode = QtWidgets.QLineEdit.Normal
 path, res = QtWidgets.QInputDialog.getText(qid, title, label, mode) # path -> path to config-qgis.ini
 
 # initialization
 
-crs = QgsCoordinateReferenceSystem("EPSG:32633")
+crs = QgsCoordinateReferenceSystem('EPSG:32633')
 QgsProject.instance().setCrs(crs) # standard crs (does not work!)
 
 config = []  # contains all the configurations
@@ -46,6 +46,8 @@ for line in file_tiff:
 file_tiff.close()
 file_shp = open(shape_dat_path, 'w')
 
+shapes = [] # array of vector layers
+
 # core
 
 # loops over all tiff images
@@ -71,34 +73,34 @@ for i in range(len(tiffs)):
     entries.append(band)
 
     # Raster calculation process
-    calc = QgsRasterCalculator(band.ref, tiffs[i], "GTiff", raster.extent(), raster.width(), raster.height(), entries)
+    calc = QgsRasterCalculator(band.ref, tiffs[i], 'GTiff', raster.extent(), raster.width(), raster.height(), entries)
     calc.processCalculation() # creates a Raster GDAL-compatible (editable), overwrites old tiff file
 
     #QgsProject.instance().removeMapLayers([raster.id()]) # tiff is not useful anymore #####################################################
 	
     #QgsProject.instance().addMapLayer(QgsRasterLayer(raws[0], filename)) # adds raw image to project as raster ######################################################
 	
-    processing.run(r"gdal:polygonize",
+    processing.run('gdal:polygonize',
     {'INPUT': tiffs[i],
         'BAND': 1,
-        'FIELD': 'VEGETATED',
+        'FIELD': 'vegetated',
         'EIGHT_CONNECTEDNESS': 1,
-        'OUTPUT': shapefolder + "/" + filename + ".shp"}) # generates shp
+        'OUTPUT': shapefolder + '/' + filename + '.shp'}) # generates shp
 
-    file_shp.write(shapefolder + "/" + filename + ".shp")
-    shp = QgsVectorLayer(shapefolder + "/" + filename + ".shp", 'SHP_' + filename, 'ogr')
+    file_shp.write(shapefolder + '/' + filename + '.shp\n')
+    shp = QgsVectorLayer(shapefolder + '/' + filename + '.shp', 'SHP_' + filename, 'ogr')
     shp.setCrs(crs)
     with edit(shp):
-        soil = QgsFeatureRequest().setFilterExpression('"VEGETATED" != 255')
+        soil = QgsFeatureRequest().setFilterExpression('"vegetated" != 255')
         soil.setSubsetOfAttributes([])
         soil.setFlags(QgsFeatureRequest.NoGeometry)
         for feature in shp.getFeatures(soil):
             shp.deleteFeature(feature.id()) # remove soil
 
-    shp.dataProvider().addAttributes([QgsField('AREA', QVariant.Double), QgsField('PERIMETER', QVariant.Double)]) # adds attributes to the vector layer (test)
+    shp.dataProvider().addAttributes([QgsField('area', QVariant.Double), QgsField('perimeter', QVariant.Double)]) # adds attributes to the vector layer (test)
     shp.updateFields()
-    area = shp.fields().indexFromName('AREA')
-    perimeter = shp.fields().indexFromName('PERIMETER')
+    area = shp.fields().indexFromName('area')
+    perimeter = shp.fields().indexFromName('perimeter')
     shp.startEditing()
     e0 = QgsExpression("""$area""")
     e1 = QgsExpression("""$perimeter""")
@@ -115,7 +117,14 @@ for i in range(len(tiffs)):
             area: e0.evaluate(c),
             perimeter: e1.evaluate(c)}})
     shp.commitChanges()
-    
+    shapes.append(shp)
     QgsProject.instance().addMapLayer(shp) # adds shp to project, to be manually modified
 
+# merge vectors and load
+processing.run('qgis:mergevectorlayers',
+    {'LAYERS': shapes,
+        'CRS': 'EPSG:32633',
+        'OUTPUT': shapefile_directory + '/OUTPUT.shp'})
+QgsProject.instance().addMapLayer(QgsVectorLayer(shapefile_directory + '/OUTPUT.shp', 'OUTPUT', 'ogr'))
+file_shp.write(shapefile_directory + '/OUTPUT.shp\n')
 file_shp.close()

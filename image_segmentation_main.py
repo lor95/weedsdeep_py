@@ -79,8 +79,8 @@ raw_file.close()
 
 tiff_file = open(tiff_file_path, 'w')
 
-lat = ['43.5587','43.5598','43.5608','43.5618'] ######################################
-long = ['13.2226','13.2226','13.2226','13.2226'] ######################################
+#latitude = ['43.5587','43.5598','43.5608','43.5618'] ######################################
+#longitude = ['13.2226','13.2226','13.2226','13.2226'] ######################################
 
 
 if not os.path.exists(raster_directory):
@@ -88,26 +88,21 @@ if not os.path.exists(raster_directory):
 
 for i in range(len(images)):    
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
-	
-    v = i ##################################################################################################
-    lat[v], long[v] = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), lat[v], long[v]) ##################################################
-	
-    #with exiftool.ExifTool() as e:
-    #   lat = e.get_tag('EXIF:GPSLatitude', images[i])
-    #   long = e.get_tag('EXIF:GPSLongitude', images[i])
+
+    #v = i ##################################################################################################
+    #latitude[v], longitude[v] = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), latitude[v], longitude[v]) ##################################################
     
-    #if config['crs_transform']:
-    #    lat, long = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), lat, long)    
-    #    with exiftool.ExifTool(exiftool_exe) as e:
-    #        e.execute("-GPSLatitude=" + lat, images[i]) # update metadata
-    #        e.execute("-GPSAltitude=" + long, images[i])
+    with exiftool.ExifTool() as e:
+        latitude = e.get_tag('EXIF:GPSLatitude', images[i])
+        longitude = e.get_tag('EXIF:GPSLongitude', images[i])
     
-    #with exiftool.ExifTool() as e:
-    #    meta_lat = e.get_tag('EXIF:GPSLatitude', images[i])
-    #    meta_long = e.get_tag('EXIF:GPSLongitude', images[i])
-    #    print(meta_lat);print(meta_long)
+    if config['crs_transform']:
+        latitude, longitude = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), latitude, longitude)    
+        #with exiftool.ExifTool() as e:
+        #    e.execute(bytes('-GPSLatitude=' + str(latitude), 'utf-8'), bytes(images[i], 'utf-8')) # update metadata
+        #    e.execute(bytes('-GPSLongitude=' + str(longitude), 'utf-8'), bytes(images[i], 'utf-8'))
     
-	# image processing
+    # image processing
 
     img = cv.imread(images[i])  # for loop starts for each img in RAW.dat
     img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
@@ -139,10 +134,10 @@ for i in range(len(images)):
     img = cv.erode(img, d_e_kernel, config['iterations']) # erode n times
     
     # write data
-	
+
     tiff_file.write(raster_directory + '/' + filename + '.tiff\n')
     cv.imwrite(raster_directory + '/' + filename + '.tiff', img) # save image
-	
+
     #driver = gdal.GetDriverByName('GTiff') operate with gdal?!
     
     tfw_file = open(raster_directory + '/' + filename + '.tfw', 'w') ###################################
@@ -150,8 +145,8 @@ for i in range(len(images)):
     tfw_file.write(str(config['rotate_y']) + '\n') ####################################################
     tfw_file.write(str(config['rotate_x']) + '\n') #################################################
     tfw_file.write('-' + str(config['gsd']) + '\n') ###################################################
-    tfw_file.write(str(long[v]) + '\n') ##############################################################
-    tfw_file.write(str(lat[v]) + '\n') #############################################################
+    tfw_file.write(str(longitude) + '\n') ##############################################################
+    tfw_file.write(str(latitude) + '\n') #############################################################
     tfw_file.close() ################################################################################
     
     # check    
@@ -165,6 +160,6 @@ for i in range(len(images)):
             break
         cv.destroyAllWindows()
 
-		
+
 # end loop
 tiff_file.close()
