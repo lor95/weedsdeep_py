@@ -18,7 +18,7 @@ path, res = QtWidgets.QInputDialog.getText(qid, title, label, mode) # path -> pa
 # initialization
 
 crs = QgsCoordinateReferenceSystem('EPSG:32633')
-QgsProject.instance().setCrs(crs) # standard crs (does not work!)
+QgsProject.instance().setCrs(crs)
 
 config = []  # contains all the configurations
 config_qgis_ini = open(path, 'r')  # Gui
@@ -76,9 +76,11 @@ for i in range(len(tiffs)):
     calc = QgsRasterCalculator(band.ref, tiffs[i], 'GTiff', raster.extent(), raster.width(), raster.height(), entries)
     calc.processCalculation() # creates a Raster GDAL-compatible (editable), overwrites old tiff file
 
-    #QgsProject.instance().removeMapLayers([raster.id()]) # tiff is not useful anymore #####################################################
+    QgsProject.instance().removeMapLayers([raster.id()]) # tiff is not useful anymore #####################################################
 	
-    #QgsProject.instance().addMapLayer(QgsRasterLayer(raws[0], filename)) # adds raw image to project as raster ######################################################
+    raw = QgsRasterLayer(raws[i], filename)
+    raw.setCrs(crs)
+    QgsProject.instance().addMapLayer(raw) # adds raw image to project as raster ######################################################
 	
     processing.run('gdal:polygonize',
     {'INPUT': tiffs[i],

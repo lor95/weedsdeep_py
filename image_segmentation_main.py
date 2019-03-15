@@ -5,14 +5,16 @@ import sys
 import cv2 as cv
 import numpy as np
 import exiftool
-#import gdal
+from shutil import copyfile
 from pyproj import Proj, transform
 import xml.etree.ElementTree as et
 
 raw_file_path = sys.argv[1]
-tiff_file_path = sys.argv[2]
-raster_directory = sys.argv[3]
-config_xml_path = sys.argv[4]
+tbands_tiff_path = sys.argv[2] #############################################
+tiff_file_path = sys.argv[3]
+tbands_raster_directory = sys.argv[4] ########################################
+raster_directory = sys.argv[5]
+config_xml_path = sys.argv[6]
 
 config = {} # settings array
 
@@ -77,34 +79,33 @@ for line in raw_file:
     images.append(line.strip())
 raw_file.close()
 
+mband_tiff_file = open(tbands_tiff_path, 'w') #########################################
 tiff_file = open(tiff_file_path, 'w')
 
-#latitude = ['43.5587','43.5598','43.5608','43.5618'] ######################################
-#longitude = ['13.2226','13.2226','13.2226','13.2226'] ######################################
-
+if not os.path.exists(tbands_raster_directory): ##################################################
+    os.makedirs(tbands_raster_directory) #######################################################
 
 if not os.path.exists(raster_directory):
     os.makedirs(raster_directory)
 
 for i in range(len(images)):    
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
-
-    #v = i ##################################################################################################
-    #latitude[v], longitude[v] = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), latitude[v], longitude[v]) ##################################################
     
     with exiftool.ExifTool() as e:
         latitude = e.get_tag('EXIF:GPSLatitude', images[i])
         longitude = e.get_tag('EXIF:GPSLongitude', images[i])
-    
     if config['crs_transform']:
         latitude, longitude = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), latitude, longitude)    
         #with exiftool.ExifTool() as e:
         #    e.execute(bytes('-GPSLatitude=' + str(latitude), 'utf-8'), bytes(images[i], 'utf-8')) # update metadata
         #    e.execute(bytes('-GPSLongitude=' + str(longitude), 'utf-8'), bytes(images[i], 'utf-8'))
-    
+  
     # image processing
 
     img = cv.imread(images[i])  # for loop starts for each img in RAW.dat
+
+    cv.imwrite(tbands_raster_directory + '/' + filename + '.tiff', img) ########################################################################
+
     img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
     img = cv.inRange(img, (config['h_lb'], config['s_lb'], config['v_lb']), (config['h_ub'], config['s_ub'], config['v_ub'])) # mask green, exclude soil
@@ -135,20 +136,21 @@ for i in range(len(images)):
     
     # write data
 
+    mband_tiff_file.write(tbands_raster_directory + '/' + filename + '.tiff\n') #############################################
     tiff_file.write(raster_directory + '/' + filename + '.tiff\n')
     cv.imwrite(raster_directory + '/' + filename + '.tiff', img) # save image
+    
+    tfw_file = open(tbands_raster_directory + '/' + filename + '.tfw', 'w')
+    tfw_file.write(str(config['gsd']) + '\n')
+    tfw_file.write(str(config['rotate_y']) + '\n')
+    tfw_file.write(str(config['rotate_x']) + '\n')
+    tfw_file.write('-' + str(config['gsd']) + '\n')
+    tfw_file.write(str(longitude) + '\n')
+    tfw_file.write(str(latitude) + '\n')
+    tfw_file.close()
 
-    #driver = gdal.GetDriverByName('GTiff') operate with gdal?!
-    
-    tfw_file = open(raster_directory + '/' + filename + '.tfw', 'w') ###################################
-    tfw_file.write(str(config['gsd']) + '\n') #########################################################
-    tfw_file.write(str(config['rotate_y']) + '\n') ####################################################
-    tfw_file.write(str(config['rotate_x']) + '\n') #################################################
-    tfw_file.write('-' + str(config['gsd']) + '\n') ###################################################
-    tfw_file.write(str(longitude) + '\n') ##############################################################
-    tfw_file.write(str(latitude) + '\n') #############################################################
-    tfw_file.close() ################################################################################
-    
+    copyfile(tbands_raster_directory + '/' + filename + '.tfw', raster_directory + '/' + filename + '.tfw') #####################################
+
     # check    
     if config['show_img']:
         winname = filename + ' - Press ESC to quit execution.'

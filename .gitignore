@@ -1,5 +1,7 @@
 /.project
 /.pydevproject
+/config_lubuntu.ini
+img/tbands_rasters
 img/rasters
 img/shapefiles
 data/
