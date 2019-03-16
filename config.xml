@@ -9,7 +9,7 @@
 		<!-- if 1 -> EPSG:4326 -> EPSG:32633 -->
 		<crs_transform>1</crs_transform>
 		<!-- 1 (pixel) = var (meters) -->
-		<gsd>0.00095</gsd>
+		<gsd>0.00045</gsd>
 		<rotate_x>0</rotate_x>
 		<rotate_y>0</rotate_y>
 	</geo_params>
@@ -38,11 +38,11 @@
 		<!-- dilation/erosion params -->
 		<dil_er>
 			<ksize>11</ksize>
-			<iterations>7</iterations>
+			<iterations>8</iterations>
 		</dil_er>
 		<!-- resizing params -->
 		<resize>
-			<n_times>2</n_times>
+			<n_times>4</n_times>
 			<ratio>0.5</ratio>
 			<!-- 0 linear interpolation (INT_LINEAR)
 				 1 nearest neighbour interpolation (INT_NEAREST) -->
@@ -51,7 +51,7 @@
 		<!-- labeling params -->
 		<labeling>
 			<!-- min value in pixels -->
-			<area_thr>8500</area_thr>
+			<area_thr>35000</area_thr>
 		</labeling>
 	</segmentation_params>
 </config>

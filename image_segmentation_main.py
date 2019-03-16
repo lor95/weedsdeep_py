@@ -95,10 +95,7 @@ for i in range(len(images)):
         latitude = e.get_tag('EXIF:GPSLatitude', images[i])
         longitude = e.get_tag('EXIF:GPSLongitude', images[i])
     if config['crs_transform']:
-        latitude, longitude = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), latitude, longitude)    
-        #with exiftool.ExifTool() as e:
-        #    e.execute(bytes('-GPSLatitude=' + str(latitude), 'utf-8'), bytes(images[i], 'utf-8')) # update metadata
-        #    e.execute(bytes('-GPSLongitude=' + str(longitude), 'utf-8'), bytes(images[i], 'utf-8'))
+        latitude, longitude = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), latitude, longitude)
   
     # image processing
 
