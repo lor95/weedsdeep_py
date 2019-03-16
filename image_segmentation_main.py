@@ -92,10 +92,11 @@ for i in range(len(images)):
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
     
     with exiftool.ExifTool() as e:
-        latitude = e.get_tag('EXIF:GPSLatitude', images[i])
         longitude = e.get_tag('EXIF:GPSLongitude', images[i])
+        latitude = e.get_tag('EXIF:GPSLatitude', images[i])
+    
     if config['crs_transform']:
-        latitude, longitude = transform(Proj('EPSG:4326'), Proj('EPSG:32633'), latitude, longitude)
+        longitude, latitude = transform(Proj(init = 'EPSG:4326'), Proj(init = 'EPSG:32633'), longitude, latitude)
   
     # image processing
 
