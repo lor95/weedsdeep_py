@@ -2,10 +2,6 @@
 
 /.pydevproject
 
-/config_lubuntu.ini
-
-img/raw/old/data
-
 /img/raw/*.jgw
 img/tbands_rasters
 

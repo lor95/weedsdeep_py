@@ -2,9 +2,10 @@
 
 ##### Deep-learning per la classificazione di infestanti in scenari di agricoltura di precisione mediante immagini multi-spettrali.
 
-La prima idea è quella di utilizzare due script:  
+La prima idea è quella di utilizzare tre scripts:  
 
 ```
+rawdat_generator.py [path/to/images/folder] [path/to/rawdat/folder]
 image_segmentation_main.py [path/to/RAW.dat] [path/to/TIFF.dat] [path/to/rasters/directory] [path/to/config.xml]
 qgis_processing.py
 ```
