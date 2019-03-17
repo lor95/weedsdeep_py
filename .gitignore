@@ -6,6 +6,7 @@
 
 img/raw/old/data
 
+/img/raw/*.jgw
 img/tbands_rasters
 
 img/rasters

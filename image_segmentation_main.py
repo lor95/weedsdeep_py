@@ -10,11 +10,11 @@ from pyproj import Proj, transform
 import xml.etree.ElementTree as et
 
 raw_file_path = sys.argv[1]
-tbands_tiff_path = sys.argv[2] #############################################
-tiff_file_path = sys.argv[3]
-tbands_raster_directory = sys.argv[4] ########################################
-raster_directory = sys.argv[5]
-config_xml_path = sys.argv[6]
+#tbands_tiff_path = sys.argv[2] #############################################
+tiff_file_path = sys.argv[2]
+#tbands_raster_directory = sys.argv[4] ########################################
+raster_directory = sys.argv[3]
+config_xml_path = sys.argv[4]
 
 config = {} # settings array
 
@@ -79,16 +79,13 @@ for line in raw_file:
     images.append(line.strip())
 raw_file.close()
 
-mband_tiff_file = open(tbands_tiff_path, 'w') #########################################
 tiff_file = open(tiff_file_path, 'w')
-
-if not os.path.exists(tbands_raster_directory): ##################################################
-    os.makedirs(tbands_raster_directory) #######################################################
 
 if not os.path.exists(raster_directory):
     os.makedirs(raster_directory)
 
-for i in range(len(images)):    
+for i in range(len(images)):
+    raw_directory = os.path.dirname(images[i])    
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
     
     with exiftool.ExifTool() as e:
@@ -101,9 +98,6 @@ for i in range(len(images)):
     # image processing
 
     img = cv.imread(images[i])  # for loop starts for each img in RAW.dat
-
-    cv.imwrite(tbands_raster_directory + '/' + filename + '.tiff', img) ########################################################################
-
     img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
     img = cv.inRange(img, (config['h_lb'], config['s_lb'], config['v_lb']), (config['h_ub'], config['s_ub'], config['v_ub'])) # mask green, exclude soil
@@ -134,20 +128,19 @@ for i in range(len(images)):
     
     # write data
 
-    mband_tiff_file.write(tbands_raster_directory + '/' + filename + '.tiff\n') #############################################
     tiff_file.write(raster_directory + '/' + filename + '.tiff\n')
     cv.imwrite(raster_directory + '/' + filename + '.tiff', img) # save image
     
-    tfw_file = open(tbands_raster_directory + '/' + filename + '.tfw', 'w')
-    tfw_file.write(str(config['gsd']) + '\n')
-    tfw_file.write(str(config['rotate_y']) + '\n')
-    tfw_file.write(str(config['rotate_x']) + '\n')
-    tfw_file.write('-' + str(config['gsd']) + '\n')
-    tfw_file.write(str(longitude) + '\n')
-    tfw_file.write(str(latitude) + '\n')
-    tfw_file.close()
+    worldfile = open(raw_directory + '/' + filename + '.jgw', 'w')
+    worldfile.write(str(config['gsd']) + '\n')
+    worldfile.write(str(config['rotate_y']) + '\n')
+    worldfile.write(str(config['rotate_x']) + '\n')
+    worldfile.write('-' + str(config['gsd']) + '\n')
+    worldfile.write(str(longitude) + '\n')
+    worldfile.write(str(latitude) + '\n')
+    worldfile.close()
 
-    copyfile(tbands_raster_directory + '/' + filename + '.tfw', raster_directory + '/' + filename + '.tfw') #####################################
+    copyfile(raw_directory + '/' + filename + '.jgw', raster_directory + '/' + filename + '.tfw') #####################################
 
     # check    
     if config['show_img']:

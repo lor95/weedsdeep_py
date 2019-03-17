@@ -9,7 +9,7 @@
 		<!-- if 1 -> EPSG:4326 -> EPSG:32633 -->
 		<crs_transform>1</crs_transform>
 		<!-- 1 (pixel) = var (meters) -->
-		<gsd>0.00040</gsd>
+		<gsd>0.0004</gsd>
 		<rotate_x>0</rotate_x>
 		<rotate_y>0</rotate_y>
 	</geo_params>

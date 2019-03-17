@@ -60,23 +60,23 @@ for i in range(len(tiffs)):
     if not os.path.exists(shapefolder):
         os.makedirs(shapefolder)
 
-    raster = QgsRasterLayer(tiffs[i], filename)
-    raster.setCrs(crs)
-    QgsProject.instance().addMapLayer(raster) # .tiff is loaded in the project
-    entries = []
+    #raster = QgsRasterLayer(tiffs[i], filename)
+    #raster.setCrs(crs)
+    #QgsProject.instance().addMapLayer(raster) # .tiff is loaded in the project
+    #entries = []
 
     # Define band
-    band = QgsRasterCalculatorEntry()
-    band.ref = filename + '@1'
-    band.raster = raster
-    band.bandNumber = 1
-    entries.append(band)
+    #band = QgsRasterCalculatorEntry()
+    #band.ref = filename + '@1'
+    #band.raster = raster
+    #band.bandNumber = 1
+    #entries.append(band)
 
     # Raster calculation process
-    calc = QgsRasterCalculator(band.ref, tiffs[i], 'GTiff', raster.extent(), raster.width(), raster.height(), entries)
-    calc.processCalculation() # creates a Raster GDAL-compatible (editable), overwrites old tiff file
+    #calc = QgsRasterCalculator(band.ref, tiffs[i], 'GTiff', raster.extent(), raster.width(), raster.height(), entries)
+    #calc.processCalculation() # creates a Raster GDAL-compatible (editable), overwrites old tiff file
 
-    QgsProject.instance().removeMapLayers([raster.id()]) # tiff is not useful anymore #####################################################
+    #QgsProject.instance().removeMapLayers([raster.id()]) # tiff is not useful anymore #####################################################
 	
     raw = QgsRasterLayer(raws[i], filename)
     raw.setCrs(crs)
