@@ -5,14 +5,13 @@ import sys
 import cv2 as cv
 import numpy as np
 import exiftool
+import math
 from shutil import copyfile
 from pyproj import Proj, transform
 import xml.etree.ElementTree as et
 
 raw_file_path = sys.argv[1]
-#tbands_tiff_path = sys.argv[2] #############################################
 tiff_file_path = sys.argv[2]
-#tbands_raster_directory = sys.argv[4] ########################################
 raster_directory = sys.argv[3]
 config_xml_path = sys.argv[4]
 
@@ -30,8 +29,7 @@ for conf in general:
 for param in geo:
     config['crs_transform'] = int(param.find('crs_transform').text)
     config['gsd'] = float(param.find('gsd').text)
-    config['rotate_x'] = float(param.find('rotate_x').text)
-    config['rotate_y'] = float(param.find('rotate_y').text)
+    config['angle'] = float(param.find('angle').text)
 for param in params:
     hsv_mask = param.findall('hsv_mask')
     gauss = param.findall('gaussian_blur')
@@ -53,7 +51,7 @@ for param in resize:
     config['ratio'] = float(param.find('ratio').text)
     config['interpolation'] = int(param.find('interpolation').text)
 for param in labeling:
-    config['area_thr'] = int(param.find('area_thr').text)
+    config['area_thr'] = float(param.find('area_thr').text)
 # third level
 for param in hsv_lb:
     config['h_lb'] = int(param.find('h').text)
@@ -117,9 +115,10 @@ for i in range(len(images)):
     # labeling phase
     out = cv.connectedComponentsWithStats(img)
     sizes = out[2][1:, -1];
-    for i in range(0, out[0] - 1):  
-        if sizes[i] >= config['area_thr']:
-            img[out[1] == i + 1] = 255 # weed/crop
+    area_thr = config['area_thr'] / (config['gsd'] ** 2)
+    for i in range(0, out[0] - 1):
+        if sizes[i] >= area_thr:
+            img[out[1] == i + 1] = i + 1 # weed/crop
         else:
             img[out[1] == i + 1] = 0 # add small elements to background
 
@@ -130,17 +129,18 @@ for i in range(len(images)):
 
     tiff_file.write(raster_directory + '/' + filename + '.tiff\n')
     cv.imwrite(raster_directory + '/' + filename + '.tiff', img) # save image
-    
+
     worldfile = open(raw_directory + '/' + filename + '.jgw', 'w')
-    worldfile.write(str(config['gsd']) + '\n')
-    worldfile.write(str(config['rotate_y']) + '\n')
-    worldfile.write(str(config['rotate_x']) + '\n')
-    worldfile.write('-' + str(config['gsd']) + '\n')
+    
+    worldfile.write(str(config['gsd'] * math.cos(config['angle'])) + '\n')
+    worldfile.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
+    worldfile.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
+    worldfile.write(str(- config['gsd'] * math.cos(config['angle'])) + '\n')
     worldfile.write(str(longitude) + '\n')
     worldfile.write(str(latitude) + '\n')
     worldfile.close()
 
-    copyfile(raw_directory + '/' + filename + '.jgw', raster_directory + '/' + filename + '.tfw') #####################################
+    copyfile(raw_directory + '/' + filename + '.jgw', raster_directory + '/' + filename + '.tfw')
 
     # check    
     if config['show_img']:

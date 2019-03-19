@@ -3,8 +3,6 @@
 /.pydevproject
 
 /img/raw/*.jgw
-img/tbands_rasters
-
 img/rasters
 
 img/shapefiles

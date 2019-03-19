@@ -85,7 +85,7 @@ for i in range(len(tiffs)):
     processing.run('gdal:polygonize',
     {'INPUT': tiffs[i],
         'BAND': 1,
-        'FIELD': 'vegetated',
+        'FIELD': 'id',
         'EIGHT_CONNECTEDNESS': 1,
         'OUTPUT': shapefolder + '/' + filename + '.shp'}) # generates shp
 
@@ -93,7 +93,7 @@ for i in range(len(tiffs)):
     shp = QgsVectorLayer(shapefolder + '/' + filename + '.shp', 'SHP_' + filename, 'ogr')
     shp.setCrs(crs)
     with edit(shp):
-        soil = QgsFeatureRequest().setFilterExpression('"vegetated" != 255')
+        soil = QgsFeatureRequest().setFilterExpression('"id" = 0')
         soil.setSubsetOfAttributes([])
         soil.setFlags(QgsFeatureRequest.NoGeometry)
         for feature in shp.getFeatures(soil):
@@ -123,10 +123,10 @@ for i in range(len(tiffs)):
     QgsProject.instance().addMapLayer(shp) # adds shp to project, to be manually modified
 
 # merge vectors and load
-processing.run('qgis:mergevectorlayers',
-    {'LAYERS': shapes,
-        'CRS': 'EPSG:32633',
-        'OUTPUT': shapefile_directory + '/OUTPUT.shp'})
-QgsProject.instance().addMapLayer(QgsVectorLayer(shapefile_directory + '/OUTPUT.shp', 'OUTPUT', 'ogr'))
-file_shp.write(shapefile_directory + '/OUTPUT.shp\n')
+#processing.run('qgis:mergevectorlayers',
+#    {'LAYERS': shapes,
+#        'CRS': 'EPSG:32633',
+#        'OUTPUT': shapefile_directory + '/OUTPUT.shp'})
+#QgsProject.instance().addMapLayer(QgsVectorLayer(shapefile_directory + '/OUTPUT.shp', 'OUTPUT', 'ogr'))
+#file_shp.write(shapefile_directory + '/OUTPUT.shp\n')
 file_shp.close()

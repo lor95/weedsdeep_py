@@ -3,6 +3,7 @@ import sys
 
 folder = sys.argv[1]
 dest = sys.argv[2]
+#mode = sys.argv[3] write/append
 
 files = os.listdir(folder)
 
