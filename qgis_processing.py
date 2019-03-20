@@ -1,6 +1,7 @@
 # REQUIRED QGIS >= 3
 
 import os
+import pathlib
 import processing
 import qgis.utils
 from qgis.core import *
@@ -123,7 +124,7 @@ for i in range(len(tiffs)):
     shapes.append(shp)
     QgsProject.instance().addMapLayer(shp) # adds shp to project, to be manually modified
 
-    data = QgsVectorLayer('file://' + raster_directory + '/' + filename + '.csv?delimiter=;', 'csv', 'delimitedtext') # add csv layer to get data from
+    data = QgsVectorLayer(str(pathlib.Path(raster_directory).as_uri()) + '/' + filename + '.csv?delimiter=;', 'csv', 'delimitedtext') # add csv layer to get data from
     QgsProject.instance().addMapLayer(data)
     join = QgsVectorLayerJoinInfo()
     join.setJoinFieldName('id')
