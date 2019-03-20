@@ -49,8 +49,8 @@
 		</resize>
 		<!-- labeling params -->
 		<labeling>
-			<!-- (min) area threshold [mq] -> 1 px = gsd^2 mq -->
-			<area_thr>0.022</area_thr>
+			<!-- (min) area threshold [mq] -> 1 px = 1 / gsd^2 mq -->
+			<area_thr>0.0212</area_thr>
 		</labeling>
 	</segmentation_params>
 </config>

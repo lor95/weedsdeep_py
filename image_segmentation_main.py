@@ -6,9 +6,9 @@ import cv2 as cv
 import numpy as np
 import exiftool
 import math
+import xml.etree.ElementTree as et
 from shutil import copyfile
 from pyproj import Proj, transform
-import xml.etree.ElementTree as et
 
 raw_file_path = sys.argv[1]
 tiff_file_path = sys.argv[2]
@@ -82,7 +82,7 @@ tiff_file = open(tiff_file_path, 'w')
 if not os.path.exists(raster_directory):
     os.makedirs(raster_directory)
 
-for i in range(len(images)):
+for i in range(len(images)): # for each image
     raw_directory = os.path.dirname(images[i])    
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
     
@@ -116,43 +116,45 @@ for i in range(len(images)):
     img = cv.erode(img, d_e_kernel, config['iterations']) # erode n times
     
     csv_file = open(raster_directory + '/' + filename + '.csv', 'w')
-    csv_file.write('id;area;length;compactness;convexity;solidity;roundness;formfactor;elongation;rect_fit;main_dir;max_axis_len;min_axis_len;num_holes;holesolrat;convex_hull_area;convex_hull_length;outer_contour_length;outer_contour_area\n')    
+    header = 'id;area;length;compactness;convexity;solidity;roundness;formfactor;elongation;rect_fit;main_dir;max_axis_len;min_axis_len;num_holes;holesolrat;convex_hull_area;convex_hull_length;outer_contour_area;outer_contour_length\n'
+    csv_file.write(header)    
     
     # labeling phase
+    
     out = cv.connectedComponentsWithStats(img)
-    sizes = out[2][1:, -1];
-    area_thr = config['area_thr'] / (config['gsd'] ** 2) # convert to pixel
+    sizes = out[2][1:, -1]
+    area_thr = config['area_thr'] / (config['gsd'] ** 2) # convert area [mq] to area [px]
     for i in range(0, out[0] - 1):
-        if sizes[i] >= area_thr:
+        if sizes[i] >= area_thr: # vegetated area
             _id = i + 1
-            img[out[1] == _id] = _id # considered as vegetated area
+            img[out[1] == _id] = _id
             temp = img.copy()
-            for temp_bg in range(1, out[0]):
+            for temp_bg in range(1, out[0]): # set temporarily every feature (except the one considered) as background
                 if temp_bg != _id:
                     temp[out[1] == temp_bg] = 0
-            contours, hierachy = cv.findContours(temp, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+            contours, hierachy = cv.findContours(temp, cv.RETR_TREE, cv.CHAIN_APPROX_NONE) # get contours of the considered feature
+
+            # evaluate spatial properties
+
             _convex_hull_area = cv.contourArea(cv.convexHull(contours[0]))
             _convex_hull_length = cv.arcLength(cv.convexHull(contours[0]), True)
             _outer_contour_area = cv.contourArea(contours[0])
             _outer_contour_length = cv.arcLength(contours[0], True)
             _area = _outer_contour_area
             _length = _outer_contour_length
-            bounds = cv.boundingRect(contours[0])
-            if bounds[2] >= bounds[3]: # if width >= height
-                _max_axis_len = bounds[2]
-                _min_axis_len = bounds[3]
-            else:
-                _max_axis_len = bounds[3]
-                _min_axis_len = bounds[2]
+            width, height = cv.boundingRect(contours[0])[2:] # gets bounding rectangle properties, such as width and heigth
+            _max_axis_len = max(width, height)
+            _min_axis_len = min(width, height)
+            _main_dir = cv.fitEllipse(contours[0])[2]
             _numholes = len(contours) - 1
             for cnt in contours[1:]:
-                _length += cv.arcLength(cnt, True)
-                _area -= cv.contourArea(cnt)
+                _area -= cv.contourArea(cnt) # subtracts holes' area
+                _length += cv.arcLength(cnt, True) # adds holes' perimeter
             _compactness = math.sqrt(4 * _area / math.pi) / _outer_contour_length
             _convexity = _convex_hull_length / _length
             _solidity = _area / _convex_hull_area
             _roundness = (4 / math.pi) * _area / (_max_axis_len ** 2)
-            _formfactor = 4 * math.pi * _area / (_length ** 2)
+            _form_factor = 4 * math.pi * _area / (_length ** 2)
             _elongation = _max_axis_len / _min_axis_len
             _rect_fit = _area / (_max_axis_len * _min_axis_len)
             _holesolrat = _area / _outer_contour_area
@@ -164,19 +166,21 @@ for i in range(len(images)):
             + str(_convexity) + ';'
             + str(_solidity) + ';'
             + str(_roundness) + ';' 
-            + str(_formfactor) + ';'
+            + str(_form_factor) + ';'
             + str(_elongation) + ';'
-            + str(_rect_fit) + ';;'
+            + str(_rect_fit) + ';'
+            + str(_main_dir) + ';'
             + str(_max_axis_len) + ';'
             + str(_min_axis_len) + ';' 
             + str(_numholes) + ';' 
             + str(_holesolrat) + ';'
             + str(_convex_hull_area) + ';'
             + str(_convex_hull_length) + ';' 
-            + str(_outer_contour_length) + ';' 
-            + str(_outer_contour_area) + '\n')
+            + str(_outer_contour_area) + ';' 
+            + str(_outer_contour_length) + '\n')
+
         else:
-            img[out[1] == i + 1] = 0 # add small elements to background
+            img[out[1] == i + 1] = 0 # directly adds small elements to background
 
     csv_file.close()
     
