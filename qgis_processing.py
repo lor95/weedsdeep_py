@@ -31,6 +31,7 @@ raw_dat_path = os.path.dirname(path) + config[0] # path to RAW.dat
 tiff_dat_path = os.path.dirname(path) + config[1] # path to TIFF.dat
 shapefile_directory = os.path.dirname(path) + config[2]
 shape_dat_path = os.path.dirname(path) + config[3] # path to SHP.dat
+raster_directory = os.path.dirname(path) + config[4] # path to rasters
 
 if not os.path.exists(shapefile_directory):
     os.makedirs(shapefile_directory)
@@ -42,7 +43,7 @@ for line in file_raw:
 file_raw.close()
 file_tiff = open(tiff_dat_path, 'r')
 for line in file_tiff:
-	tiffs.append(line.strip())
+    tiffs.append(line.strip())
 file_tiff.close()
 file_shp = open(shape_dat_path, 'w')
 
@@ -55,7 +56,7 @@ for i in range(len(tiffs)):
 
     # Load Raster
     filename = os.path.splitext(os.path.basename(tiffs[i]))[0] # gets the first .tiff file name (without extension)
-	
+
     shapefolder = shapefile_directory + '/' + filename # folder that contains shp for every file
     if not os.path.exists(shapefolder):
         os.makedirs(shapefolder)
@@ -76,11 +77,11 @@ for i in range(len(tiffs)):
     #calc = QgsRasterCalculator(band.ref, tiffs[i], 'GTiff', raster.extent(), raster.width(), raster.height(), entries)
     #calc.processCalculation() # creates a Raster GDAL-compatible (editable), overwrites old tiff file
 
-    #QgsProject.instance().removeMapLayers([raster.id()]) # tiff is not useful anymore #####################################################
+    #QgsProject.instance().removeMapLayers([raster.id()])
 	
     raw = QgsRasterLayer(raws[i], filename)
     raw.setCrs(crs)
-    QgsProject.instance().addMapLayer(raw) # adds raw image to project as raster ######################################################
+    QgsProject.instance().addMapLayer(raw) # adds raw image to project as raster
 	
     processing.run('gdal:polygonize',
     {'INPUT': tiffs[i],
@@ -121,6 +122,16 @@ for i in range(len(tiffs)):
     shp.commitChanges()
     shapes.append(shp)
     QgsProject.instance().addMapLayer(shp) # adds shp to project, to be manually modified
+
+    data = QgsVectorLayer('file://' + raster_directory + '/' + filename + '.csv?delimiter=;', 'csv', 'delimitedtext') # add csv layer to get data from
+    QgsProject.instance().addMapLayer(data)
+    join = QgsVectorLayerJoinInfo()
+    join.setJoinFieldName('id')
+    join.setTargetFieldName('id')
+    join.setJoinLayerId(data.id())
+    join.setUsingMemoryCache(True)
+    join.setJoinLayer(data)
+    shp.addJoin(join)
 
 # merge vectors and load
 #processing.run('qgis:mergevectorlayers',

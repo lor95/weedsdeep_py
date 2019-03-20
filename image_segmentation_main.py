@@ -112,33 +112,85 @@ for i in range(len(images)):
     for i in range(config['n_times']): # resize
         img = cv.resize(img, None, fx = config['ratio'] ** -1, fy = config['ratio'] ** -1, interpolation = config['interpolation'])
 
-    # labeling phase
-    out = cv.connectedComponentsWithStats(img)
-    sizes = out[2][1:, -1];
-    area_thr = config['area_thr'] / (config['gsd'] ** 2)
-    for i in range(0, out[0] - 1):
-        if sizes[i] >= area_thr:
-            img[out[1] == i + 1] = i + 1 # weed/crop
-        else:
-            img[out[1] == i + 1] = 0 # add small elements to background
-
     img = cv.dilate(img, d_e_kernel, config['iterations']) # dilate n times
     img = cv.erode(img, d_e_kernel, config['iterations']) # erode n times
     
-    # write data
+    csv_file = open(raster_directory + '/' + filename + '.csv', 'w')
+    csv_file.write('id;area;length;compactness;convexity;solidity;roundness;formfactor;elongation;rect_fit;main_dir;max_axis_len;min_axis_len;num_holes;holesolrat;convex_hull_area;convex_hull_length;outer_contour_length;outer_contour_area\n')    
+    
+    # labeling phase
+    out = cv.connectedComponentsWithStats(img)
+    sizes = out[2][1:, -1];
+    area_thr = config['area_thr'] / (config['gsd'] ** 2) # convert to pixel
+    for i in range(0, out[0] - 1):
+        if sizes[i] >= area_thr:
+            _id = i + 1
+            img[out[1] == _id] = _id # considered as vegetated area
+            temp = img.copy()
+            for temp_bg in range(1, out[0]):
+                if temp_bg != _id:
+                    temp[out[1] == temp_bg] = 0
+            contours, hierachy = cv.findContours(temp, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+            _convex_hull_area = cv.contourArea(cv.convexHull(contours[0]))
+            _convex_hull_length = cv.arcLength(cv.convexHull(contours[0]), True)
+            _outer_contour_area = cv.contourArea(contours[0])
+            _outer_contour_length = cv.arcLength(contours[0], True)
+            _area = _outer_contour_area
+            _length = _outer_contour_length
+            bounds = cv.boundingRect(contours[0])
+            if bounds[2] >= bounds[3]: # if width >= height
+                _max_axis_len = bounds[2]
+                _min_axis_len = bounds[3]
+            else:
+                _max_axis_len = bounds[3]
+                _min_axis_len = bounds[2]
+            _numholes = len(contours) - 1
+            for cnt in contours[1:]:
+                _length += cv.arcLength(cnt, True)
+                _area -= cv.contourArea(cnt)
+            _compactness = math.sqrt(4 * _area / math.pi) / _outer_contour_length
+            _convexity = _convex_hull_length / _length
+            _solidity = _area / _convex_hull_area
+            _roundness = (4 / math.pi) * _area / (_max_axis_len ** 2)
+            _formfactor = 4 * math.pi * _area / (_length ** 2)
+            _elongation = _max_axis_len / _min_axis_len
+            _rect_fit = _area / (_max_axis_len * _min_axis_len)
+            _holesolrat = _area / _outer_contour_area
 
+            csv_file.write(str(_id) + ';' 
+            + str(_area) + ';' 
+            + str(_length) + ';' 
+            + str(_compactness) + ';'
+            + str(_convexity) + ';'
+            + str(_solidity) + ';'
+            + str(_roundness) + ';' 
+            + str(_formfactor) + ';'
+            + str(_elongation) + ';'
+            + str(_rect_fit) + ';;'
+            + str(_max_axis_len) + ';'
+            + str(_min_axis_len) + ';' 
+            + str(_numholes) + ';' 
+            + str(_holesolrat) + ';'
+            + str(_convex_hull_area) + ';'
+            + str(_convex_hull_length) + ';' 
+            + str(_outer_contour_length) + ';' 
+            + str(_outer_contour_area) + '\n')
+        else:
+            img[out[1] == i + 1] = 0 # add small elements to background
+
+    csv_file.close()
+    
     tiff_file.write(raster_directory + '/' + filename + '.tiff\n')
     cv.imwrite(raster_directory + '/' + filename + '.tiff', img) # save image
 
-    worldfile = open(raw_directory + '/' + filename + '.jgw', 'w')
-    
-    worldfile.write(str(config['gsd'] * math.cos(config['angle'])) + '\n')
-    worldfile.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
-    worldfile.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
-    worldfile.write(str(- config['gsd'] * math.cos(config['angle'])) + '\n')
-    worldfile.write(str(longitude) + '\n')
-    worldfile.write(str(latitude) + '\n')
-    worldfile.close()
+    world_file = open(raw_directory + '/' + filename + '.jgw', 'w') # world file    
+    world_file.write(str(config['gsd'] * math.cos(config['angle'])) + '\n')
+    world_file.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
+    world_file.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
+    world_file.write(str(- config['gsd'] * math.cos(config['angle'])) + '\n')
+    world_file.write(str(longitude) + '\n')
+    world_file.write(str(latitude) + '\n')
+    world_file.close()
 
     copyfile(raw_directory + '/' + filename + '.jgw', raster_directory + '/' + filename + '.tfw')
 
