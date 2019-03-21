@@ -86,10 +86,10 @@ for i in range(len(images)): # for each image
     raw_directory = os.path.dirname(images[i])    
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
     
-    with exiftool.ExifTool() as e:
-        longitude = e.get_tag('EXIF:GPSLongitude', images[i])
-        latitude = e.get_tag('EXIF:GPSLatitude', images[i])
-    
+    #with exiftool.ExifTool() as e:
+    #    longitude = e.get_tag('EXIF:GPSLongitude', images[i])
+    #    latitude = e.get_tag('EXIF:GPSLatitude', images[i])
+    longitude = 12; latitude = 12;
     if config['crs_transform']:
         longitude, latitude = transform(Proj(init = 'EPSG:4326'), Proj(init = 'EPSG:32633'), longitude, latitude)
   
@@ -133,7 +133,7 @@ for i in range(len(images)): # for each image
                 if temp_bg != _id:
                     temp[out[1] == temp_bg] = 0
             contours, hierachy = cv.findContours(temp, cv.RETR_TREE, cv.CHAIN_APPROX_NONE) # get contours of the considered feature
-
+                        
             # evaluate spatial properties
 
             _convex_hull_area = cv.contourArea(cv.convexHull(contours[0]))

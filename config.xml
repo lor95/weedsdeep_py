@@ -50,7 +50,7 @@
 		<!-- labeling params -->
 		<labeling>
 			<!-- (min) area threshold [mq] -> 1 px = 1 / gsd^2 mq -->
-			<area_thr>0.0212</area_thr>
+			<area_thr>0.0000212</area_thr>
 		</labeling>
 	</segmentation_params>
 </config>
