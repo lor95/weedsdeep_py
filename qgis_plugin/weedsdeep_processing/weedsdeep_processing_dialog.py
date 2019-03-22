@@ -21,4 +21,3 @@ class WeedsDeepDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.shpfolder_browser.setStorageMode(QgsFileWidget.StorageMode.GetDirectory)
         self.shpdat_browser.setStorageMode(QgsFileWidget.StorageMode.GetDirectory)
-        self.button.rejected.connect(self.reject)

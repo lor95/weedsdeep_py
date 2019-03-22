@@ -1,19 +1,37 @@
 # WEEDSDEEP PROJECT
 
-##### Deep-learning per la classificazione di infestanti in scenari di agricoltura di precisione mediante immagini multi-spettrali.
+#### Deep-learning per la classificazione di infestanti in scenari di agricoltura di precisione mediante immagini multi-spettrali.
 
-La prima idea è quella di utilizzare tre scripts:  
+La prima idea è quella di utilizzare due scripts:  
 
 ```
-rawdat_generator.py [path/to/images/folder] [path/to/rawdat/folder]
-image_segmentation_main.py [path/to/RAW.dat] [path/to/TIFF.dat] [path/to/rasters/directory] [path/to/config.xml]
-qgis_processing.py
+rawdat_generator.py [path/to/images/directory] [path/to/rawdat/directory] [mode]
+images_processing_main.py [path/to/RAW.dat] [path/to/tiffdat/directory] [path/to/rasters/directory] [path/to/config.xml]
 ```
 
-`image_segmentation_main.py`, che necessita l'installazione di `opencv-python` `pyexiftool` e `pyproj`, segmenta una serie di immagini (listata nel file `RAW.dat`) dividendo, per ogni immagine e mediante una serie di operazioni, la vegetazione (_crop/weed_) dal terreno (_soil_).  
-Le immagini così segmentate vengono salvate nella directory passata per argomento, ed i rispettivi paths vanno a popolare il file `TIFF.dat`.  
-Per ogni immagine vengono estratti i metadati relativi alla localizzazione _GPS_ e salvati in appositi files _.tfw_.  (Questo viene fatto sia per i raster monobanda, immagini segmentate, sia per le immagini raw, con il world file nella corretta estensione)  
-All'interno del file `config.xml` è possibile configurare la segmentazione.  
-`qgis_processing.py` viene lanciato all'interno dell'ambiente _QGIS_ (richiesta la versione _3_ o superiore), genera gli _shapefiles_ della lista di immagini escludendo il terreno.  
-Gli _shapefiles_ vengono inoltre visualizzati nel progetto _QGIS_ per una maggiore comprensione degli stessi, posizionati secondo i dati di localizzazione.  
+## rawdat_generator.py
+
+`rawdat_generator.py` è uno script di supporto utile a generare il file `RAW.dat`, dove sono listati i path delle immagini da processare.  
+Dati in input il path alla directory contenente i files immagini (al momento sono supportati __solo__ i _.jpg_) ed il path della directory che ospiterà il file creato, da in output il file `RAW.dat` nella relativa directory.  
+Può funzionare in due modalità `[mode]`:  
+
+* __w__: _write mode_ - genera un file ex-novo, eventualmente sovrascrivendo un file esistente nella stessa directory.  
+* __a__: _append mode_ - genera o aggiorna il file `RAW.dat` (se già presente) aggiungendo path in coda.  
+
+Ogni altro inserimento come terzo parametro determina il funzionamento in _default mode_ (_write mode_).
+
+## images_processing_main.py
+
+__Dipendenze esterne__: `opencv-python` - `pyexiftool` - `pyproj`  
+
+`images_processing_main.py` segmenta una serie di immagini in input, i quali path sono contenuti nel file `RAW.dat`, discriminando la vegetazione (_crop/weed_) dal terreno (_soil_). Individua elementi singoli per i quali ne calcola attributi dimensionali e prepara l'ambiente per operazioni di _deep learning_.  
+Ogni immagine processata è salvata nella directory indicata come parametro in input, insieme ad un relativo _world file_, contenente le coordinate longitudinali e latitudinali estratte dai _metadata GPS_ (oltre al loro orientamento rispetto l'asse _N-S_), ed un _comma separated values file_ (_.csv_), dove sono salvati tutti gli attributi dimensionali di ogni elemento individuato come _crop/weed_.  
+Gli stessi _world files_ sono copiati anche nella directory delle immagini di partenza.  
+Al termine genera un file `TIFF.dat` nella directory passata come parametro contenente i path di ogni immagine processata.  
+Tutte le operazioni possono essere configurate utilizzando il file _.xml_ di configurazione.  
+
+## QGIS WeedsDeep
+
+Serve a visualizzare blabla
+Per installare il plugin copiare il contenuto in QgsApplication.qgisSettingsDirPath() /python/plugins in alternativa installare come .zip nel dialog di riferimento
 

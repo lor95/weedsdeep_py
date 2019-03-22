@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -31,9 +31,22 @@
   <property name="windowTitle">
    <string>QGIS WeedsDeep</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">body: #ffffff</string>
-  </property>
+  <widget class="QDialogButtonBox" name="button_box">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>340</y>
+     <width>341</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
@@ -65,43 +78,25 @@
      <item row="1" column="0">
       <widget class="QLabel" name="tiffdat_label">
        <property name="text">
-        <string>TIFF.dat path:</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;TIFF.dat&lt;/span&gt; path:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QgsFileWidget" name="rawdat_browser">
-       <property name="acceptDrops">
-        <bool>true</bool>
-       </property>
-       <property name="filter">
-        <string>Text File (*.dat)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="shpfolder_label">
-       <property name="text">
-        <string>Shapefiles folder:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="rawdat_label">
-       <property name="text">
-        <string>RAW.dat path:</string>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
        </property>
       </widget>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="shpdat_label">
        <property name="text">
-        <string>SHP.dat folder:</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;SHP.dat&lt;/span&gt; folder:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QgsFileWidget" name="tiffdat_browser">
+     <item row="0" column="1">
+      <widget class="QgsFileWidget" name="rawdat_browser">
        <property name="acceptDrops">
         <bool>true</bool>
        </property>
@@ -120,7 +115,34 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="0" column="0">
+      <widget class="QLabel" name="rawdat_label">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;RAW.dat&lt;/span&gt; path:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QgsFileWidget" name="tiffdat_browser">
+       <property name="acceptDrops">
+        <bool>true</bool>
+       </property>
+       <property name="filter">
+        <string>Text File (*.dat)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="shpfolder_label">
+       <property name="text">
+        <string>Shapefiles folder:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
       <widget class="QgsFileWidget" name="shpfolder_browser">
        <property name="contextMenuPolicy">
         <enum>Qt::DefaultContextMenu</enum>
@@ -139,36 +161,17 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>340</y>
-     <width>161</width>
-     <height>68</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="footer">
-    <item>
-     <widget class="QDialogButtonBox" name="button">
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QLabel" name="description">
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>10</y>
+     <y>0</y>
      <width>381</width>
      <height>71</height>
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;This plugin generates shapefiles from given &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;RAW.dat&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; and &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;TIFF.dat&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;:&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;Shapefiles folder&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;- folder where to save the generated &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-style:italic;&quot;&gt;.shp&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; files. (subfolders are created)&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;SHP.dat folder&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; - folder where to generate &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;SHP.dat&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; file, it contains paths to &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-style:italic;&quot;&gt;.shp&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; files.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;This plugin generates shapefiles from given &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;RAW.dat&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; and &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;TIFF.dat&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;:&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;SHP.dat folder&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; - folder where to generate &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;SHP.dat&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; file, it contains paths to &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-style:italic;&quot;&gt;.shp&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; files.&lt;/span&gt;&lt;br/&gt;&lt;span style=&quot; font-size:7pt; font-weight:600;&quot;&gt;Shapefiles folder &lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;- folder where to save the generated &lt;/span&gt;&lt;span style=&quot; font-size:7pt; font-style:italic;&quot;&gt;.shp&lt;/span&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt; files. (subfolders are created)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="textFormat">
     <enum>Qt::RichText</enum>
@@ -184,13 +187,13 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>9</y>
+     <y>10</y>
      <width>141</width>
      <height>51</height>
     </rect>
    </property>
    <property name="frameShape">
-    <enum>QFrame::Box</enum>
+    <enum>QFrame::StyledPanel</enum>
    </property>
    <property name="frameShadow">
     <enum>QFrame::Sunken</enum>
@@ -228,5 +231,38 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>button_box</sender>
+   <signal>accepted()</signal>
+   <receiver>WeedsDeepDialogBase</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>button_box</sender>
+   <signal>rejected()</signal>
+   <receiver>WeedsDeepDialogBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

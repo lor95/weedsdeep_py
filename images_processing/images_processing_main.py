@@ -11,7 +11,7 @@ from shutil import copyfile
 from pyproj import Proj, transform
 
 raw_file_path = sys.argv[1]
-tiff_file_path = sys.argv[2]
+tiff_file_directory = sys.argv[2]
 raster_directory = sys.argv[3]
 config_xml_path = sys.argv[4]
 
@@ -77,19 +77,21 @@ for line in raw_file:
     images.append(line.strip())
 raw_file.close()
 
-tiff_file = open(tiff_file_path, 'w')
-
 if not os.path.exists(raster_directory):
     os.makedirs(raster_directory)
+if not os.path.exists(tiff_file_directory):
+    os.makedirs(tiff_file_directory)
+
+tiff_file = open(tiff_file_directory + '/TIFF.dat', 'w')
 
 for i in range(len(images)): # for each image
     raw_directory = os.path.dirname(images[i])    
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
-    
-    #with exiftool.ExifTool() as e:
-    #    longitude = e.get_tag('EXIF:GPSLongitude', images[i])
-    #    latitude = e.get_tag('EXIF:GPSLatitude', images[i])
-    longitude = 12; latitude = 12;
+
+    with exiftool.ExifTool() as e:
+        longitude = e.get_tag('EXIF:GPSLongitude', images[i])
+        latitude = e.get_tag('EXIF:GPSLatitude', images[i])
+
     if config['crs_transform']:
         longitude, latitude = transform(Proj(init = 'EPSG:4326'), Proj(init = 'EPSG:32633'), longitude, latitude)
   
