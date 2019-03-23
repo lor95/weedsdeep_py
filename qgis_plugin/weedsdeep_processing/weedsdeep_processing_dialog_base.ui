@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>QGIS WeedsDeep</string>
+   <string>QGIS - WeedsDeep</string>
   </property>
   <widget class="QDialogButtonBox" name="button_box">
    <property name="geometry">

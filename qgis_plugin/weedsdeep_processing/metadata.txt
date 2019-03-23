@@ -1,14 +1,14 @@
 [general]
 name=WeedsDeep
 qgisMinimumVersion=3.0
-description=WeedsDeep project.
-version=1.0
+description=Genera shapefiles di ortofoto dinamicamente, discriminando il terreno dalla vegetazione.
+version=1.1
 author=Lorenzo Giuliani
 email=lorenzogiuliani95@hotmail.com
-about=Generates shapefiles.
-tracker=http://bugs
-repository=https://bitbucket.org/lor95_/weedsdeep_py/
-tags=weed detection,python,deep learning,shapefiles,shp
+about=Deep-learning per la classificazione di infestanti in scenari di agricoltura di precisione mediante immagini multi-spettrali.
+tracker=mailto:lorenzogiuliani95@hotmail.com?Subject=WeedsDeep_Bug_Tracker
+repository=https://bitbucket.org/lor95_/weedsdeep_py
+tags=weed detection,crop,soil
 category=Plugins
 icon=icon.png
 experimental=False
