@@ -1,6 +1,4 @@
 /.project
 /.pydevproject
-/img/raw/*.jgw
-img/rasters
-img/shapefiles
+img/
 data/

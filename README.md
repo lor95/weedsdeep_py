@@ -21,6 +21,8 @@ __Dipendenze esterne__: `opencv-python` - `pyexiftool` - `pyproj`
 
 __Utilizzo__: `images_processing_main.py [path/to/RAW.dat] [path/to/tiffdat/directory] [path/to/rasters/directory] [path/to/config.xml]`  
 
+__Note aggiuntive__: E' necessario installare il tool _[Exiftool](https://www.sno.phy.queensu.ca/~phil/exiftool/)_ (aggiungerlo al system PATH, nel caso di un utilizzo del software su _Windows_).  
+
 `images_processing_main.py` segmenta una serie di immagini in input, i quali path sono contenuti nel file `RAW.dat`, discriminando la vegetazione (_crop/weed_) dal terreno (_soil_). Individua elementi singoli per i quali ne calcola attributi dimensionali e prepara l'ambiente per operazioni di _deep learning_.  
 Ogni immagine processata è salvata nella directory indicata come parametro in input, insieme ad un relativo _world file_, contenente le coordinate longitudinali e latitudinali estratte dai _metadata GPS_ (oltre al loro orientamento rispetto l'asse _N-S_), ed un _comma separated values file_ (_.csv_), dove sono salvati tutti gli attributi dimensionali di ogni elemento individuato come _crop/weed_.  
 Gli stessi _world files_ sono copiati anche nella directory delle immagini di partenza.  
@@ -41,3 +43,10 @@ Essa si individua facilmente, essendo contenuta nella _settings folder_ dell'amb
 
 Alternativamente è possibile installare il plugin compresso in formato _.zip_ (`/qgis_plugin/weedsdeep_processing.zip`) __cliccando su__ `Plugins -> Gestisci ed Installa Plugin... -> Installa da ZIP`.
 
+## data_augmentation_processing_main.py
+
+__Dipendenze esterne__: `tensorflow` - `numpy` - `scipy` - `pillow`  
+
+__Utilizzo__:  `data_augmentation_processing_main.py [path/to/RAW.dat] [path/to/destination/folder]`  
+
+...
