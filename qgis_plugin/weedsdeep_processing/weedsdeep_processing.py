@@ -2,6 +2,7 @@ import os
 import pathlib
 import processing
 import qgis.utils
+from qgis.gui import QgsMessageBar
 from qgis.core import *
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant
 from PyQt5.QtGui import QIcon
@@ -95,8 +96,8 @@ class WeedsDeep:
         # Run the dialog event loop
         result = self.dlg.exec_()
         if result:
-            # initialization
-            
+
+            # initialization            
             # set paths
             raw_dat_path = self.dlg.rawdat_browser.filePath()
             tiff_dat_path = self.dlg.tiffdat_browser.filePath()
@@ -110,8 +111,11 @@ class WeedsDeep:
             # read data
             if not os.path.exists(shapefile_directory):
                 os.makedirs(shapefile_directory)
+            
             raws = []
             tiffs = []
+            shapes = [] # array of vector layers
+
             file_raw = open(raw_dat_path, 'r')
             for line in file_raw:
                 raws.append(line.strip())
@@ -122,10 +126,7 @@ class WeedsDeep:
             file_tiff.close()
             file_shp = open(shape_dat_directory + '/SHP.dat', 'w')
 
-            shapes = [] # array of vector layers
-
             # core
-
             # loops over all tiff images
             for i in range(len(tiffs)):
                 # Load Rasters
@@ -134,9 +135,10 @@ class WeedsDeep:
                 shapefolder = shapefile_directory + '/' + filename # folder that contains shp for every file
                 if not os.path.exists(shapefolder):
                     os.makedirs(shapefolder)
-    
-                raw = QgsRasterLayer(raws[i], filename)
+                
+                raw = QgsRasterLayer(raws[i], filename)                
                 raw.setCrs(crs)
+
                 QgsProject.instance().addMapLayer(raw) # adds raw image to project as raster
     
                 processing.run('gdal:polygonize',
@@ -146,9 +148,10 @@ class WeedsDeep:
                                 'EIGHT_CONNECTEDNESS': 1,
                                 'OUTPUT': shapefolder + '/' + filename + '.shp'}) # generates shp
 
-                file_shp.write(shapefolder + '\n')
+                file_shp.write(shapefolder + '/' + filename + '.shp\n')
                 shp = QgsVectorLayer(shapefolder + '/' + filename + '.shp', 'SHP_' + filename, 'ogr')
                 shp.setCrs(crs)
+                
                 with edit(shp):
                     soil = QgsFeatureRequest().setFilterExpression('"id" = 0')
                     soil.setSubsetOfAttributes([])
@@ -189,4 +192,6 @@ class WeedsDeep:
                 join.setJoinLayer(data)
                 shp.addJoin(join)
 
+            self.iface.messageBar().clearWidgets()
+            self.iface.messageBar().pushMessage('Done loading...', level = 0, duration = 5)
             file_shp.close()
