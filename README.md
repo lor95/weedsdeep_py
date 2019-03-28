@@ -2,9 +2,9 @@
 
 #### Deep-learning per la classificazione di infestanti in scenari di agricoltura di precisione mediante immagini multi-spettrali.
 
-## rawdat_generator.py
+## imglist_generator.py
 
-__Utilizzo__: `rawdat_generator.py [path/to/images/directory] [path/to/rawdat/directory] [mode]`  
+__Utilizzo__: `imglist_generator.py [path/to/images/directory] [path/to/rawdat/directory] [mode]`  
 
 `rawdat_generator.py` è uno script di supporto utile a generare il file `RAW.dat`, dove sono listati i path delle immagini da processare.  
 Dati in input il path alla directory contenente i files immagini (al momento sono supportati __solo__ i _.jpg_) ed il path della directory che ospiterà il file creato, da in output il file `RAW.dat` nella relativa directory.  

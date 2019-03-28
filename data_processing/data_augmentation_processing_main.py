@@ -24,13 +24,16 @@ for param in batch:
     config['rotation'] = int(param.find('rotation').text)
     config['width_shift'] = int(param.find('width_shift').text)
     config['height_shift'] = int(param.find('height_shift').text)
+    config['channel_shift'] = int(param.find('channel_shift').text)
     config['shear'] = int(param.find('shear').text)
     config['zoom'] = int(param.find('zoom').text)
     config['horizontal_flip'] = int(param.find('horizontal_flip').text)
+    config['vertical_flip'] = int(param.find('vertical_flip').text)
 for param in values:
     data['rotation'] = int(param.find('rotation_range').text)
     data['width_shift'] = float(param.find('width_shift_range').text)
     data['height_shift'] = float(param.find('height_shift_range').text)
+    data['channel_shift'] = float(param.find('channel_shift_range').text)
     data['shear'] = float(param.find('shear_range').text)
     data['zoom'] = float(param.find('zoom_range').text)
 
@@ -55,13 +58,15 @@ datagen = ImageDataGenerator(
         shear_range = data['shear'],
         zoom_range = data['zoom'],
         horizontal_flip = config['horizontal_flip'],
+        vertical_flip = config['vertical_flip'],
         fill_mode = 'constant')
 
+# generate images
 for image in images:        
-    img = load_img(image)  # this is a PIL image
-    x = img_to_array(img)  # this is a Numpy array with shape (3, 150, 150)
+    img = load_img(image)
+    x = img_to_array(img)
     # resize here
-    x = x.reshape((1,) + x.shape)  # this is a Numpy array with shape (1, 3, 150, 150)
+    x = x.reshape((1,) + x.shape)
 
     i = 0
     for batch in datagen.flow(x,
