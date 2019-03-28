@@ -47,6 +47,6 @@ Alternativamente è possibile installare il plugin compresso in formato _.zip_ (
 
 __Dipendenze esterne__: `tensorflow` - `numpy` - `scipy` - `pillow`  
 
-__Utilizzo__:  `data_augmentation_processing_main.py [path/to/RAW.dat] [path/to/destination/folder]`  
+__Utilizzo__:  `data_augmentation_processing_main.py [path/to/RAW.dat] [path/to/destination/folder] [path/to/config.xml]`  
 
 ...

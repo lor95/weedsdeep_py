@@ -6,6 +6,8 @@
 		<show_img>0</show_img>
 	</general>
 	<geo_params>
+		<!-- if 1 - consider gps params and generate world file -->
+		<geo_stats_bool>0</geo_stats_bool>
 		<!-- if 1: EPSG:4326 -> EPSG:32633 (QGIS)-->
 		<crs_transform>1</crs_transform>
 		<!-- 1 (pixel) = var (meters) -->
@@ -50,7 +52,7 @@
 		<!-- labeling params -->
 		<labeling>
 			<!-- (min) area threshold [mq] -> 1 px = 1 / gsd^2 mq -->
-			<area_thr>0.0212</area_thr>
+			<area_thr>0</area_thr>
 		</labeling>
 	</segmentation_params>
 </config>

@@ -17,7 +17,7 @@ config_xml_path = sys.argv[4]
 
 config = {} # settings array
 
-root = et.parse(config_xml_path).getroot() # contains all the configurations, path should be sent via GUI
+root = et.parse(config_xml_path).getroot() # contains all the configurations
 
 # root level
 general = root.findall('general')
@@ -27,6 +27,7 @@ params = root.findall('segmentation_params')
 for conf in general:
     config['show_img'] = int(conf.find('show_img').text)
 for param in geo:
+    config['geo_stats_bool'] = int(param.find('geo_stats_bool').text)
     config['crs_transform'] = int(param.find('crs_transform').text)
     config['gsd'] = float(param.find('gsd').text)
     config['angle'] = float(param.find('angle').text)
@@ -88,12 +89,13 @@ for i in range(len(images)): # for each image
     raw_directory = os.path.dirname(images[i])    
     filename = os.path.splitext(os.path.basename(images[i]))[0]  # gets the image file name (without extension)
 
-    with exiftool.ExifTool() as e:
-        longitude = e.get_tag('EXIF:GPSLongitude', images[i])
-        latitude = e.get_tag('EXIF:GPSLatitude', images[i])
+    if config['geo_stats_bool']:
+        with exiftool.ExifTool() as e:
+            longitude = e.get_tag('EXIF:GPSLongitude', images[i])
+            latitude = e.get_tag('EXIF:GPSLatitude', images[i])
 
-    if config['crs_transform']:
-        longitude, latitude = transform(Proj(init = 'EPSG:4326'), Proj(init = 'EPSG:32633'), longitude, latitude)
+        if config['crs_transform']:
+            longitude, latitude = transform(Proj(init = 'EPSG:4326'), Proj(init = 'EPSG:32633'), longitude, latitude)
   
     # image processing
 
@@ -116,7 +118,7 @@ for i in range(len(images)): # for each image
 
     img = cv.dilate(img, d_e_kernel, config['iterations']) # dilate n times
     img = cv.erode(img, d_e_kernel, config['iterations']) # erode n times
-    
+	
     csv_file = open(raster_directory + '/' + filename + '.csv', 'w')
     header = 'id;area;length;compactness;convexity;solidity;roundness;formfactor;elongation;rect_fit;main_dir;max_axis_len;min_axis_len;num_holes;holesolrat;convex_hull_area;convex_hull_length;outer_contour_area;outer_contour_length\n'
     csv_file.write(header)    
@@ -160,7 +162,7 @@ for i in range(len(images)): # for each image
             _elongation = _max_axis_len / _min_axis_len
             _rect_fit = _area / (_max_axis_len * _min_axis_len)
             _holesolrat = _area / _outer_contour_area
-
+            
             csv_file.write(str(_id) + ';' 
             + str(_area) + ';' 
             + str(_length) + ';' 
@@ -189,16 +191,16 @@ for i in range(len(images)): # for each image
     tiff_file.write(raster_directory + '/' + filename + '.tiff\n')
     cv.imwrite(raster_directory + '/' + filename + '.tiff', img) # save image
 
-    world_file = open(raw_directory + '/' + filename + '.jgw', 'w') # world file    
-    world_file.write(str(config['gsd'] * math.cos(config['angle'])) + '\n')
-    world_file.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
-    world_file.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
-    world_file.write(str(- config['gsd'] * math.cos(config['angle'])) + '\n')
-    world_file.write(str(longitude) + '\n')
-    world_file.write(str(latitude) + '\n')
-    world_file.close()
-
-    copyfile(raw_directory + '/' + filename + '.jgw', raster_directory + '/' + filename + '.tfw')
+    if config['geo_stats_bool']:
+        world_file = open(raw_directory + '/' + filename + '.jgw', 'w') # world file    
+        world_file.write(str(config['gsd'] * math.cos(config['angle'])) + '\n')
+        world_file.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
+        world_file.write(str(- config['gsd'] * math.sin(config['angle'])) + '\n')
+        world_file.write(str(- config['gsd'] * math.cos(config['angle'])) + '\n')
+        world_file.write(str(longitude) + '\n')
+        world_file.write(str(latitude) + '\n')
+        world_file.close()
+        copyfile(raw_directory + '/' + filename + '.jgw', raster_directory + '/' + filename + '.tfw')
 
     # check    
     if config['show_img']:
