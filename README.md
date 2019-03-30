@@ -49,4 +49,5 @@ __Dipendenze esterne__: `tensorflow` - `numpy` - `scipy` - `pillow`
 
 __Utilizzo__:  `data_augmentation_processing_main.py [path/to/RAW.dat] [path/to/destination/folder] [path/to/config.xml]`  
 
-...
+Utilizza il modulo `keras` per modificare _randomicamente_ immagini listate nel file `RAW.dat` e salvarle nella directory passata in input.  
+Le impostazioni di modifica sono contenute nel file _.xml_ di configurazione.  

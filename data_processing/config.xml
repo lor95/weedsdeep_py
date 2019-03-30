@@ -11,6 +11,7 @@
             <channel_shift>1</channel_shift>
             <shear>1</shear>
             <zoom>1</zoom>
+			<!-- randomly flips -->
             <horizontal_flip>1</horizontal_flip>
             <vertical_flip>0</vertical_flip>
         </batch>
