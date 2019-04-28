@@ -10,7 +10,6 @@ import xml.etree.ElementTree as et
 from shutil import copyfile
 from pyproj import Proj, transform
 
-
 location = os.path.dirname(os.path.abspath(__file__)) + '/default'
 parser = argparse.ArgumentParser(description = 'WeedsDeep Image Processor.')
 parser.add_argument('config', action = 'store', type = str,
@@ -27,14 +26,9 @@ parser.add_argument('-fdir', action = 'store', type = str,
                     default = location)
 args = parser.parse_args()
 
-config_xml_path = args.config
-raw_file_path = args.list
-raster_directory = args.rdir
-tiff_file_directory = args.fdir
-
 config = {} # settings array
 
-root = et.parse(config_xml_path).getroot() # contains all the configurations
+root = et.parse(args.config).getroot() # contains all the configurations
 
 # root level
 general = root.findall('general')
@@ -90,17 +84,17 @@ else:
 
 images = []
 
-raw_file = open(raw_file_path, 'r')
+raw_file = open(args.list, 'r')
 for line in raw_file:
     images.append(line.strip())
 raw_file.close()
 
-if not os.path.exists(raster_directory):
-    os.makedirs(raster_directory)
-if not os.path.exists(tiff_file_directory):
-    os.makedirs(tiff_file_directory)
+if not os.path.exists(args.rdir):
+    os.makedirs(args.rdir)
+if not os.path.exists(args.fdir):
+    os.makedirs(args.fdir)
 
-tiff_file = open(tiff_file_directory + '/TIFF.dat', 'w')
+tiff_file = open(args.fdir + '/TIFF.dat', 'w')
 
 for i in range(len(images)): # for each image
     raw_directory = os.path.dirname(images[i])    
@@ -136,7 +130,7 @@ for i in range(len(images)): # for each image
     img = cv.dilate(img, d_e_kernel, config['iterations']) # dilate n times
     img = cv.erode(img, d_e_kernel, config['iterations']) # erode n times
 	
-    csv_file = open(raster_directory + '/' + filename + '.csv', 'w')
+    csv_file = open(args.rdir + '/' + filename + '.csv', 'w')
     header = 'id;area;length;compactness;convexity;solidity;roundness;formfactor;elongation;rect_fit;main_dir;max_axis_len;min_axis_len;num_holes;holesolrat;convex_hull_area;convex_hull_length;outer_contour_area;outer_contour_length\n'
     csv_file.write(header)    
     
@@ -205,8 +199,8 @@ for i in range(len(images)): # for each image
 
     csv_file.close()
     
-    tiff_file.write(raster_directory + '/' + filename + '.tiff\n')
-    cv.imwrite(raster_directory + '/' + filename + '.tiff', img) # save image
+    tiff_file.write(args.rdir + '/' + filename + '.tiff\n')
+    cv.imwrite(args.rdir + '/' + filename + '.tiff', img) # save image
 
     if config['geo_stats_bool']:
         world_file = open(raw_directory + '/' + filename + '.jgw', 'w') # world file    
@@ -217,7 +211,7 @@ for i in range(len(images)): # for each image
         world_file.write(str(longitude) + '\n')
         world_file.write(str(latitude) + '\n')
         world_file.close()
-        copyfile(raw_directory + '/' + filename + '.jgw', raster_directory + '/' + filename + '.tfw')
+        copyfile(raw_directory + '/' + filename + '.jgw', args.rdir + '/' + filename + '.tfw')
 
     # check    
     if config['show_img']:

@@ -1,16 +1,24 @@
 import os
-import sys
+import argparse
 import xml.etree.ElementTree as et
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator, img_to_array, load_img
 
-raw_file_path = sys.argv[1]
-dest_directory = sys.argv[2]
-config_xml_path = sys.argv[3]
+location = os.path.dirname(os.path.abspath(__file__)) + '/default'
+parser = argparse.ArgumentParser(description = 'Randomly transforms images to enlarge dataset.')
+parser.add_argument('config', action = 'store', type = str,
+                    help = 'path to config.xml file')
+parser.add_argument('list', action = 'store', type = str,
+                    help = 'file that contains paths of the images to be transformed')
+parser.add_argument('-rdir', action = 'store', type = str,
+                    help = 'directory where the images are saved. Default location is \"./default/images\"',
+                    metavar = '<results_directory>',
+                    default = location + '/images')
+args = parser.parse_args()
 
 config = {} # settings array
 data = {} # data array
 
-root = et.parse(config_xml_path).getroot() # contains all the configurations
+root = et.parse(args.config).getroot() # contains all the configurations
 
 # root level
 augmentation = root.findall('augmentation_params')
@@ -43,13 +51,13 @@ for elem in config:
 
 images = []
 
-raw_file = open(raw_file_path, 'r')
+raw_file = open(args.list, 'r')
 for line in raw_file:
     images.append(line.strip())
 raw_file.close()
 
-if not os.path.exists(dest_directory):
-    os.makedirs(dest_directory)
+if not os.path.exists(args.rdir):
+    os.makedirs(args.rdir)
 
 datagen = ImageDataGenerator(
         rotation_range = data['rotation'],
@@ -71,7 +79,7 @@ for image in images:
     i = 0
     for batch in datagen.flow(x,
                           batch_size = 1,
-                          save_to_dir = dest_directory,
+                          save_to_dir = args.rdir,
                           save_prefix = 'plant',
                           save_format = 'jpg'):
         i += 1
