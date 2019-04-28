@@ -19,7 +19,7 @@ Può funzionare in due modalità `[-m <mode>]`:
 * __w__: _write mode_ - genera un file ex-novo, eventualmente sovrascrivendo un file esistente nella stessa directory.  
 * __a__: _append mode_ - genera o aggiorna il file `RAW.dat` (se già presente) aggiungendo path in coda.  
 
-Ogni altro inserimento come terzo parametro determina il funzionamento in _default mode_ (_write mode_).
+Ogni altro inserimento come `[-m <mode>]` determina il funzionamento in _default mode_ (_write mode_).
 
 ## images_processing_main.py
 
@@ -56,7 +56,7 @@ Alternativamente è possibile installare il plugin compresso in formato _.zip_ (
 
 ## data_augmentation_processing_main.py
 
-__Dipendenze esterne__: `tensorflow` - `numpy` - `scipy` - `pillow`  
+__Dipendenze esterne__: `tensorflow` - `scipy` - `pillow`  
 
 __Utilizzo__:  `data_augmentation_processing_main.py [-h, --help] [-rdir <results_directory>] config list`  
 

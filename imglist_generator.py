@@ -21,7 +21,7 @@ if not os.path.exists(args.fdir):
     os.makedirs(args.fdir)
 
 if args.m != 'w' and args.m != 'a':
-    print('\'%s\' args.m unknown, standard (write) args.m selected.' % args.m)
+    print('\'%s\' mode unknown, default (write) mode selected.' % args.m)
     args.m = 'w'
 
 rawdat = open(args.fdir + '/RAW.dat', args.m)
