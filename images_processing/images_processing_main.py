@@ -1,7 +1,7 @@
 # python3 requested
 
 import os
-import sys
+import argparse
 import cv2 as cv
 import numpy as np
 import exiftool
@@ -10,10 +10,27 @@ import xml.etree.ElementTree as et
 from shutil import copyfile
 from pyproj import Proj, transform
 
-raw_file_path = sys.argv[1]
-tiff_file_directory = sys.argv[2]
-raster_directory = sys.argv[3]
-config_xml_path = sys.argv[4]
+
+location = os.path.dirname(os.path.abspath(__file__)) + '/default'
+parser = argparse.ArgumentParser(description = 'WeedsDeep Image Processor.')
+parser.add_argument('config', action = 'store', type = str,
+                    help = 'path to config.xml file')
+parser.add_argument('list', action = 'store', type = str,
+                    help = 'file that contains paths of the images to be processed')
+parser.add_argument('-rdir', action = 'store', type = str,
+                    help = 'directory where processed images are saved. Default location is \"./default/images\"',
+                    metavar = '<rasters_directory>',
+                    default = location + '/images')
+parser.add_argument('-fdir', action = 'store', type = str,
+                    help = 'directory where the file that contains paths of the processed images is saved. Default location is \"./default\"',
+                    metavar = '<file_directory>',
+                    default = location)
+args = parser.parse_args()
+
+config_xml_path = args.config
+raw_file_path = args.list
+raster_directory = args.rdir
+tiff_file_directory = args.fdir
 
 config = {} # settings array
 

@@ -19,7 +19,7 @@ Ogni altro inserimento come terzo parametro determina il funzionamento in _defau
 
 __Dipendenze esterne__: `opencv-python` - `pyexiftool` - `pyproj`  
 
-__Utilizzo__: `images_processing_main.py [path/to/RAW.dat] [path/to/tiffdat/directory] [path/to/rasters/directory] [path/to/config.xml]`  
+__Utilizzo__: `images_processing_main.py [-h] [-rdir <rasters_directory>] [-fdir <file_directory>] config list`  
 
 __Note aggiuntive__: E' necessario installare il tool _[Exiftool](https://www.sno.phy.queensu.ca/~phil/exiftool/)_ (aggiungerlo al system PATH, nel caso di un utilizzo del software su _Windows_).  
 
