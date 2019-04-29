@@ -10,7 +10,7 @@ parser.add_argument('config', action = 'store', type = str,
 parser.add_argument('list', action = 'store', type = str,
                     help = 'file that contains paths of the images to be transformed')
 parser.add_argument('-rdir', action = 'store', type = str,
-                    help = 'directory where the images are saved. Default location is \"./default/images\"',
+                    help = 'directory where the images are saved. Default location is "./default/images"',
                     metavar = '<results_directory>',
                     default = location + '/images')
 args = parser.parse_args()

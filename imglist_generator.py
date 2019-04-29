@@ -2,15 +2,15 @@ import os
 import argparse
 
 location = os.path.dirname(os.path.abspath(__file__))
-parser = argparse.ArgumentParser(description = 'Generates \"RAW.dat\" file.')
+parser = argparse.ArgumentParser(description = 'Generates "RAW.dat" file.')
 parser.add_argument('dir', action = 'store', type = str,
                     help = 'path to images directory')
 parser.add_argument('-fdir', action = 'store', type = str,
-                    help = 'directory where \"RAW.dat\" is saved. Default location is \"./"',
+                    help = 'directory where "RAW.dat" is saved. Default location is "./"',
                     metavar = '<file_directory>',
                     default = location)
 parser.add_argument('-m', action = 'store', type = str,
-                    help = 'Writing mode. Default is \"w - write"',
+                    help = 'Writing mode. Default is "w - write"',
                     metavar = '<mode>',
                     default = 'w')
 args = parser.parse_args()

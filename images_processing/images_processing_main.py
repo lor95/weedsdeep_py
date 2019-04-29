@@ -17,11 +17,11 @@ parser.add_argument('config', action = 'store', type = str,
 parser.add_argument('list', action = 'store', type = str,
                     help = 'file that contains paths of the images to be processed')
 parser.add_argument('-rdir', action = 'store', type = str,
-                    help = 'directory where processed images are saved. Default location is \"./default/images\"',
+                    help = 'directory where processed images are saved. Default location is "./default/images"',
                     metavar = '<rasters_directory>',
                     default = location + '/images')
 parser.add_argument('-fdir', action = 'store', type = str,
-                    help = 'directory where the file that contains paths of the processed images is saved. Default location is \"./default\"',
+                    help = 'directory where the file that contains paths of the processed images is saved. Default location is "./default"',
                     metavar = '<file_directory>',
                     default = location)
 args = parser.parse_args()

@@ -50,7 +50,7 @@ Essa si individua facilmente, essendo contenuta nella _settings folder_ dell'amb
 
 1. Aprire _QGIS_
 2. Cliccare su _Console python_ (o premere _CTRL+ALT+P_)
-3. Scrivere `QgsApplication.qgisSettingsDirPath() + "/python/plugins"`.
+3. Scrivere `QgsApplication.qgisSettingsDirPath() + "python/plugins"`.
 
 Alternativamente è possibile installare il plugin compresso in formato _.zip_ (`/qgis_plugin/weedsdeep_processing.zip`) __cliccando su__ `Plugins -> Gestisci ed Installa Plugin... -> Installa da ZIP`.
 
