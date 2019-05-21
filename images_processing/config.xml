@@ -16,7 +16,7 @@
 	</geo_params>
 	<segmentation_params>
 		<!-- hsv mask params -->
-		<hsv_mask>
+		<hsv_mask_params>
 			<lowerb>
 				<h>35</h>
 				<s>40</s>
@@ -27,32 +27,32 @@
 				<s>255</s>
 				<v>255</v>
 			</upperb>
-		</hsv_mask>
+		</hsv_mask_params>
 		<!-- gaussian blur params -->
-		<gaussian_blur>
+		<gaussian_blur_params>
 			<ksize>
-				<x>11</x>
-				<y>11</y>
+				<x>3</x>
+				<y>3</y>
 			</ksize>
-			<sigma>7</sigma>
-		</gaussian_blur>
+			<sigma>1</sigma>
+		</gaussian_blur_params>
 		<!-- dilation/erosion params -->
-		<dil_er>
-			<ksize>13</ksize>
-			<iterations>8</iterations>
-		</dil_er>
+		<dil_er_params>
+			<ksize>3</ksize>
+			<iterations>1</iterations>
+		</dil_er_params>
 		<!-- resizing params -->
-		<resize>
-			<n_times>4</n_times>
+		<resize_params>
+			<n_times>2</n_times>
 			<ratio>0.5</ratio>
 			<!-- 0 linear interpolation (INT_LINEAR)
 				 1 nearest neighbour interpolation (INT_NEAREST) -->
 			<interpolation>0</interpolation>
-		</resize>
+		</resize_params>
 		<!-- labeling params -->
-		<labeling>
+		<labeling_params>
 			<!-- (min) area threshold [mq] -> 1 px = 1 / gsd^2 mq -->
 			<area_thr>0</area_thr>
-		</labeling>
+		</labeling_params>
 	</segmentation_params>
 </config>

@@ -2,26 +2,24 @@
 <config>
     <augmentation_params>
         <batch>
-            <!-- number of random transformation per image -->
-            <n_transform>5</n_transform>
             <!-- boolean, if 1 execute -->
             <rotation>1</rotation>
             <width_shift>1</width_shift>
             <height_shift>1</height_shift>
-            <channel_shift>1</channel_shift>
-            <shear>1</shear>
+            <channel_shift>0</channel_shift>
+            <shear>0</shear>
             <zoom>1</zoom>
 			<!-- randomly flips -->
             <horizontal_flip>1</horizontal_flip>
             <vertical_flip>0</vertical_flip>
         </batch>
         <values>
-            <rotation_range>45</rotation_range>
-            <width_shift_range>0.2</width_shift_range>
-            <height_shift_range>0.2</height_shift_range>
+            <rotation_range>4</rotation_range>
+            <width_shift_range>0.05</width_shift_range>
+            <height_shift_range>0.05</height_shift_range>
             <channel_shift_range>0.4</channel_shift_range>
             <shear_range>0.2</shear_range>
-            <zoom_range>0.2</zoom_range>
+            <zoom_range>0.05</zoom_range>
         </values>
     </augmentation_params>
 </config>

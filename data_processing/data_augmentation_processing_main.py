@@ -9,10 +9,22 @@ parser.add_argument('config', action = 'store', type = str,
                     help = 'path to config.xml file')
 parser.add_argument('list', action = 'store', type = str,
                     help = 'file that contains paths of the images to be transformed')
+parser.add_argument('-n', action = 'store', type = int,
+                    help = 'number of random transformations per image. Default is "3"',
+                    metavar = '<n_transform>',
+                    default = 3)
 parser.add_argument('-rdir', action = 'store', type = str,
                     help = 'directory where the images are saved. Default location is "./default/images"',
                     metavar = '<results_directory>',
                     default = location + '/images')
+parser.add_argument('-p', action = 'store', type = str,
+                    help = 'adds a prefix to newly generated images. Default is "image"',
+                    metavar = '<save_prefix>',
+                    default = 'image')
+parser.add_argument('-f', action = 'store', type = str,
+                    help = 'format in which images are saved. Default is ".jpg"',
+                    metavar = '<save_format>',
+                    default = 'jpg')
 args = parser.parse_args()
 
 config = {} # settings array
@@ -28,7 +40,6 @@ for param in augmentation:
     values = param.findall('values')
 # second level
 for param in batch:
-    config['n_transform'] = int(param.find('n_transform').text)
     config['rotation'] = int(param.find('rotation').text)
     config['width_shift'] = int(param.find('width_shift').text)
     config['height_shift'] = int(param.find('height_shift').text)
@@ -70,18 +81,17 @@ datagen = ImageDataGenerator(
         fill_mode = 'constant')
 
 # generate images
-for image in images:        
+for image in images:
     img = load_img(image)
     x = img_to_array(img)
-    # resize here
     x = x.reshape((1,) + x.shape)
 
     i = 0
     for batch in datagen.flow(x,
                           batch_size = 1,
                           save_to_dir = args.rdir,
-                          save_prefix = 'plant',
-                          save_format = 'jpg'):
+                          save_prefix = args.p,
+                          save_format = args.f):
         i += 1
-        if i >= config['n_transform']:
+        if i >= args.n:
             break  # otherwise the generator would loop indefinitely

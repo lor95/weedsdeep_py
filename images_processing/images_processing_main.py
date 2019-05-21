@@ -43,11 +43,11 @@ for param in geo:
     config['gsd'] = float(param.find('gsd').text)
     config['angle'] = float(param.find('angle').text)
 for param in params:
-    hsv_mask = param.findall('hsv_mask')
-    gauss = param.findall('gaussian_blur')
-    dil_er = param.findall('dil_er')
-    resize = param.findall('resize')
-    labeling = param.findall('labeling')
+    hsv_mask = param.findall('hsv_mask_params')
+    gauss = param.findall('gaussian_blur_params')
+    dil_er = param.findall('dil_er_params')
+    resize = param.findall('resize_params')
+    labeling = param.findall('labeling_params')
 # second level
 for param in hsv_mask:
     hsv_lb = param.findall('lowerb')    
@@ -104,7 +104,7 @@ for i in range(len(images)): # for each image
         with exiftool.ExifTool() as e:
             longitude = e.get_tag('EXIF:GPSLongitude', images[i])
             latitude = e.get_tag('EXIF:GPSLatitude', images[i])
-
+            
         if config['crs_transform']:
             longitude, latitude = transform(Proj(init = 'EPSG:4326'), Proj(init = 'EPSG:32633'), longitude, latitude)
   

@@ -26,7 +26,7 @@ if args.m != 'w' and args.m != 'a':
 
 rawdat = open(args.fdir + '/RAW.dat', args.m)
 for file in files:
-    if file.endswith('.jpg'):
+    if file.endswith('.jpg') or file.endswith('.jpeg') or file.endswith('.png'):
         rawdat.write(args.dir + '/' + file + '\n')
 
 rawdat.close()

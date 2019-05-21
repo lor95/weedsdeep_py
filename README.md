@@ -13,7 +13,7 @@ __Utilizzo__: `imglist_generator.py [-h, --help] [-fdir <file_directory>] [-m <m
 * __dir__: directory contenente le immagini da listare.
 
 __Descrizione__: `imglist_generator.py` è uno script di supporto utile a generare il file `RAW.dat`, dove sono listati i path delle immagini da processare.  
-Dati in input il path alla directory contenente i files immagini (al momento sono supportati __solo__ i _.jpg_) ed il path della directory che ospiterà il file creato, da in output il file `RAW.dat` nella relativa directory.  
+Dati in input il path alla directory contenente i files immagini (al momento sono supportati __solo__ i _.jpg_, _.jpeg_ e _.png_) ed il path della directory che ospiterà il file creato, da in output il file `RAW.dat` nella relativa directory.  
 Può funzionare in due modalità `[-m <mode>]`:  
 
 * __w__: _write mode_ - genera un file ex-novo, eventualmente sovrascrivendo un file esistente nella stessa directory.  
@@ -54,13 +54,33 @@ Essa si individua facilmente, essendo contenuta nella _settings folder_ dell'amb
 
 Alternativamente è possibile installare il plugin compresso in formato _.zip_ (`/qgis_plugin/weedsdeep_processing.zip`) __cliccando su__ `Plugins -> Gestisci ed Installa Plugin... -> Installa da ZIP`.
 
+## images_crop_processing_main.py
+
+__Dipendenze esterne__: `opencv-python`  
+
+__Utilizzo__: `images_crop_processing_main.py [-h, --help] [-idir <images_directory>] [-ldir <labelss_directory>] [-width <width>] [-height <height>]  [-n <imgs_per_img>] [-f <save_format>] img lbl`  
+
+* __-idir <images_directory>__: directory dove vengono salvate le immagini tagliate.
+* __-ldir <labels_directory>__: directory dove vengono salvate le labels tagliate.
+* __-width <width>__: prefisso di salvataggio delle immagini generate.
+* __-height <height>__: prefisso di salvataggio delle immagini generate.
+* __-n <imgs_per_img>__: numero di immagini generate per ciascuna immagine presente in RAW.dat.
+* __-f <save_format>__: formato con il quale vengono salvate le immagini generate.
+* __img__: path al file `RAW.dat`.
+* __lbl__: path al file `TIFF.dat`.
+
+__Descrizione__: Ritaglia le immagini listate sia nel file `RAW.dat` che nel file `TIFF.dat` e le salva nelle directory passate in input.  
+
 ## data_augmentation_processing_main.py
 
 __Dipendenze esterne__: `tensorflow` - `scipy` - `pillow`  
 
-__Utilizzo__:  `data_augmentation_processing_main.py [-h, --help] [-rdir <results_directory>] config list`  
+__Utilizzo__:  `data_augmentation_processing_main.py [-h, --help] [-n <n_transform>] [-rdir <results_directory>] [-p <save_prefix>] [-f <save_format>] config list`  
 
+* __-n <n_transform>__: numero di trasformazioni casuali per immagine.
 * __-rdir <results_directory>__: directory dove vengono salvate le immagini generate.
+* __-p <save_prefix>__: prefisso di salvataggio delle immagini generate.
+* __-f <save_format>__: formato con il quale vengono salvate le immagini generate.
 * __config__: path al file _.xml. di configurazione.
 * __list__: path al file `RAW.dat`.
 
