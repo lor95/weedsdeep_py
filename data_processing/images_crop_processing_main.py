@@ -10,13 +10,13 @@ parser.add_argument('img', action = 'store', type = str,
 parser.add_argument('lbl', action = 'store', type = str,
                     help = 'file that contains paths of the labels to be cropped')
 parser.add_argument('-idir', action = 'store', type = str,
-                    help = 'directory where the cropped images are saved. Default location is "./default/image"',
+                    help = 'directory where the cropped images are saved. Default location is "./default/images"',
                     metavar = '<images_directory>',
-                    default = location + '/images/image')
+                    default = location + '/images/')
 parser.add_argument('-ldir', action = 'store', type = str,
                     help = 'directory where the cropped labeled images are saved. Default location is "./default/label"',
                     metavar = '<labels_directory>',
-                    default = location + '/images/label')
+                    default = location + '/images/label/')
 parser.add_argument('-width', action = 'store', type = int,
                     help = 'width of the cropped image. Default is "512"',
                     metavar = '<width>',
@@ -69,7 +69,7 @@ for i in range(len(images)):
         for i in range(0, out[0] - 1):
             roi_lbl[out[1] == i + 1] = 255
             t_area += sizes[i]
-        if float(t_area / (args.width * args.height)) >= 0.08:
+        if float(t_area / (args.width * args.height)) >= 0.05:
             roi_img = image[tl_y:(tl_y + args.height), tl_x:(tl_x + args.width)]
             cv.imwrite(args.idir + '/' + str(filename) + '.' + args.f, roi_img) # save image
             cv.imwrite(args.ldir + '/' + str(filename) + '.' + args.f, roi_lbl) # save label

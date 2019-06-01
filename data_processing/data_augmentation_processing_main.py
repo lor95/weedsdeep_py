@@ -16,7 +16,7 @@ parser.add_argument('-n', action = 'store', type = int,
 parser.add_argument('-rdir', action = 'store', type = str,
                     help = 'directory where the images are saved. Default location is "./default/images"',
                     metavar = '<results_directory>',
-                    default = location + '/images')
+                    default = location + '/images/')
 parser.add_argument('-p', action = 'store', type = str,
                     help = 'adds a prefix to newly generated images. Default is "image"',
                     metavar = '<save_prefix>',
