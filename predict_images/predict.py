@@ -2,14 +2,8 @@ from model import *
 import os
 import argparse
 from matplotlib import pyplot as plt
+import matplotlib.image as mpimg
 from tensorflow.python.keras.preprocessing.image import img_to_array, load_img
-
-def plotbn(img, title):
-    plt.figure()
-    path = 'C:/Users/Lorenzo/Desktop/predict_images/'
-    plt.title(title)
-    plt.imshow(img, cmap=plt.cm.gray)
-    plt.savefig(path + str(sys.argv[1]) + '_predict.png')
 
 location = os.path.dirname(os.path.abspath(__file__)) + '/default'
 parser = argparse.ArgumentParser(description = 'Segmentation Prediction.')
@@ -33,6 +27,10 @@ for line in raw_file:
 raw_file.close()
 
 for i in range(len(images)):
+    img=mpimg.imread(images[i])
+    plt.title('input')
+    plt.imshow(img)
+    plt.savefig(args.rdir + os.path.splitext(os.path.basename(images[i]))[0] + '_plot.png')
     img = load_img(images[i])
     img = img_to_array(img)
     img = img.reshape((1,) + img.shape)
